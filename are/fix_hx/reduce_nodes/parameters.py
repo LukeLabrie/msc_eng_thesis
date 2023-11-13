@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import math
+from collections import namedtuple
 
 ###############################################################################
 # constants
@@ -10,8 +11,8 @@ import math
 pi = math.pi
 R = 8.314            # ideal gas constant
 m_H = 0.004          # molar mass of helium (kg/mol)
-#P = 2.14             # steady-state power (MW) ORNL-1845 pg. 58
-P = 1.3             # steady-state power (MW) ORNL-1845 pg. 58
+P = 2.14             # steady-state power (MW) ORNL-1845 pg. 58
+#P = 1.0             # steady-state power (MW) ORNL-1845 pg. 58
 
 # density
 rho_inconel = 8.5*1000          # inconel density (kg/m^3)
@@ -29,8 +30,8 @@ scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (MJ/kg-C) ORNL-1845
 # delays
 tau_hx_c_f = 1.00 # fuel-helium hx to core delay (unknown)
 tau_hx_c_c = 1.00 # coolant-helium hx to core delay (unknown)
-tau_c_hx_f = 1.00 # coolant-helium hx to core delay (unknown)
-tau_h = 0.01
+tau_c_hx_f = 1.00 # core->hx delay (unknown)
+tau_h = 0.5
 
 # wights
 # k_f1 = 0.465        # fractional power generation (fuel)
@@ -122,6 +123,34 @@ def Pr_US(nu,rho,c,k):
     '''
     return nu*rho*c/k
 
+Point = namedtuple('Point', ['x', 'y'])
+def hA(W,points):
+    '''
+    Quadratic approximation of convective heat transfer coefficient,
+    given available data
+
+    W: flow rate (lb/s)
+    points: data points of (flow rate (lb/s),hA)
+
+    returns hA in BTU/(sec*degF)
+    '''
+
+    # Create matrices for the system of equations
+    order = len(points) 
+    a = [[p.x**i for i in reversed(range(order))] for p in points]
+    A = np.array(a)
+    b = np.array([p.y for p in points])
+
+    # Solve for the coefficients
+    coeffs = np.linalg.solve(A, b)
+
+    # evaluate terms
+    terms = [coeffs[i]**(order-i) for i in range(order)]
+
+    return sum(terms)
+
+
+
 ###############################################################################
 # core
 ###############################################################################
@@ -148,16 +177,16 @@ T0_c_t1 = ((T0_c_f1+T0_c_c1)/2) # core tube temp
 T0_c_m = F_to_K(1300)            # beryllium initial temp
 
 # flow rates 
-F_c_f = 46/15850       # core fuel flow rate (m^3/s) ORNL-1845 pg. 120
-F_c_c = 152/15850      # core coolant flow rate (m^3/s) ORNL-1845 pg. 121
+F_c_f = 46/15850       # core fuel flow rate (gal/min)->(m^3/s) ORNL-1845 pg. 120
+F_c_c = 152/15850      # core coolant flow rate (gal/min)->(m^3/s) ORNL-1845 pg. 121
 
 # dimensions
-V_fuel = 52071.248849/2e6                  # CAD model (cm^3)->(m^3)
+V_fuel = 52071.248849/1e6                  # CAD model (cm^3)->(m^3)
 A_fuel = (69872.856584/2-(6*6.996))/10000  # CAD model (cm^3)->(m^2) 
-V_tubes = 5453.961/2e6                     # CAD model (cm^3)->(m^3)
+V_tubes = (5453.961+34777.657)/1e6                     # CAD model (cm^3)->(m^3)
 A_tubes = (73445.338-(12*7.728))/10000     # CAD model (cm^3)->(m^2)
 A_tube_bends = 2*(20044.557-(62*pi*(3.137/2)**2))/10000     # CAD model (m^2) 
-V_coolant = (248933.207)/2e6            # CAD model (m^3)
+V_coolant = (248933.207)/1e6            # CAD model (m^3)
 
 A_mc = 961677.131/10000 # CAD model (m^2)
 V_m = 926899.473/1e6 # CAD model (m^3)
@@ -208,17 +237,21 @@ hA_t_c = hA_t_c_US*(5/9)*(1.05504)*(1e-3)  # MW/(degK)
 hA_ft_c = 1/((1/hA_t_c)+(1/hA_f_c))
 
 # coolant
+A_coolant_tubes_US = 317085/929      # CAD model (cm^2)->(ft^2)
 h_c_c_US = 166 # coolant heat transfer coefficient (BTU/(hr*ft^2*defF)) ORNL-1535 p.23
+hA_c_c_US = A_coolant_tubes_US*h_c_c_US
+ 
+# hA_c_c_US = 1000*1/0.238     # ORNL-1535 pg.24
+#hA_c_c_US = h_c     # ORNL-1535 pg.24
 
 # elbows
 hA_t_c12_US = 1/(0.130) # ORNL-1535 pg.24
-hA_c_c_US = 1/0.238     # ORNL-1535 pg.24
 hA_tc_c_US = 1/((1/hA_c_c_US)+(1/hA_t_c12_US)) 
 hA_tc_c = hA_tc_c_US*(5/9)*(1.05504)*(1e-3)/2  # MW/(degK)
 
 # moderator
 hA_m_US = 1/2.060 # ORNL-1535 p.28
-hA_c_US = 1/0.771 # ORNL-1535 p.28
+hA_c_US = 1000*1/0.771 # ORNL-1535 p.28
 hA_mc_US = 1/((1/hA_m_US)+(1/hA_c_US))
 hA_mc_c = hA_mc_US*(5/9)*(1.05504)*(1e-3)/2  # MW/(degK)
 
@@ -244,41 +277,51 @@ T0_hfh_h2 = F_to_K(620)    # fuel-helium hx helium outlet temp (K) ORNL-1845 pg.
 T0_hfh_t1 = ((T0_hfh_f1+T0_hfh_h1)/2) # initial tube temp
 
 # flow rates 
-F_hfh_h1 = (7300*2)/2119    # fuel-helium hx helium fuel inlet flow rate (ft^3/min)->(m^3/s) ORNL-1845 pg. 121
-F_hfh_h2 = (12300*2)/2119    # fuel-helium hx helium fuel outlet flow rate (ft^3/min)->(m^3/s) ORNL-1845 pg. 121
+F_hfh_h1 = (7300)/2119    # fuel-helium hx helium fuel inlet flow rate (ft^3/min)->(m^3/s) ORNL-1845 pg. 121
+F_hfh_h2 = (12300)/2119    # fuel-helium hx helium fuel outlet flow rate (ft^3/min)->(m^3/s) ORNL-1845 pg. 121
 
 # dimensions
 L_eff_US = 93.65*12  # effective tube length of hx (in) ORNL-1535 pg. 47
 V_p_hx_US = (math.pi*((1.0/2)-0.109)**2)*L_eff_US # volume in hx tubes (in^3) ORNL-1535 pg. 47
 V_p_hx = V_p_hx_US/61020 # in^3 -> m^3
-V_t_hx_US = ((L_eff_US)*math.pi*((1.0/2))**2 - V_p_hx_US)/2 # tube volume in heat exchangers (in^3)
+V_t_hx_US = ((L_eff_US)*math.pi*((1.0/2))**2 - V_p_hx_US) # tube volume in heat exchangers (in^3)
 V_t_hx = V_t_hx_US/61020 # in^3 -> m^3
 A_t_hx = (pi*((1.0)-2*0.109)*L_eff_US)/144 # hx inner tube area (in^2 -> ft^2) ORNL-1535 p.47  
 A_to_hx = (pi*(1.0/2)*93.65*12)/144 # hx outer tube area (in^2 -> ft^2) ORNL-1535 p.47  
 
 # mass 
-m_f_hx = V_p_hx*fuel_density(T_fuel_avg)
+m_f_hx = 2*V_p_hx*fuel_density(T_fuel_avg)
 
-# heat transfer
-hA_f_hx_US = h_f_US*(A_t_hx*10.764)
-hA_t_hx_US = h_t_US*A_t_hx*10.764
-hA_f_hx_US = h_f_US*2*(11.15+8.02)
-hA_t_hx_US = h_t_US*2*(11.15+8.02)
+# heat transfer fuel<->tube
+hA_f_hx_US = 2*5.724   # BTU/(sec*degF) ORNL-1535 p.47
+hA_t_hx_US = 2*(1/0.137) # BTU/(sec*degF) ORNL-1535 p.47
 hA_ft_hx_US = 1/((1/hA_f_hx_US)+(1/hA_t_hx_US))
 hA_ft_hx = hA_ft_hx_US*(5/9)*(1.05504)*(1e-3) 
 
-mcp_t_hx = V_t_hx*rho_inconel*scp_t
-m_h_hxfh = (((27.0*27.5*27)/61020)-V_t_hx-V_p_hx)*rho_h/2 # hx dimension minus tube volume, factor of two for two nodes
+# mass flow rate of helium
+W_h_fh = F_hfh_h1*(0.1362) # (kg/s) = volumetric flow rate * denisty of helium at 180F, 2.2 H20, 7300 cfm ORNL-1845 p.122
+W_h_fh_US = W_h_fh*2.205   # (lb/s)
 
-hA_h_US_hx = (0.955+0.800+0.580)/3         # ORNL-1535 p.47 (average)
-hA_ht_US_hx = 1/((1/hA_t_hx_US)+(1/hA_h_US_hx))  # BTU/(sec*degF)
-hA_th_hx = hA_ht_US_hx*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
+# heat transfer tube<->helium
 
+# available coefficient data for helium ORNL-1535 p.47 
+fh_p1 = Point(0.5,0.58)
+fh_p2 = Point(1.0,0.8)
+fh_p3 = Point(1.5,0.955)
+hA_h_hx_US = 2*hA(W_h_fh_US,[fh_p1,fh_p2,fh_p3])
+hA_ht_hx_US = 1/((1/hA_h_hx_US)+(1/hA_t_hx_US))
+hA_ht_hx = hA_ht_hx_US*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> (MW/C)
+
+#hA_h_US_hx = (0.955+0.800+0.580)/3         # ORNL-1535 p.47 (average)
+#hA_ht_US_hx = 1/((1/hA_t_hx_US)+(1/hA_h_US_hx))  # BTU/(sec*degF)
+#hA_th_hx = hA_ht_US_hx*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
+
+m_h_hxfh = 2*(((27.0*27.5*27)/61020)-V_t_hx-V_p_hx)*rho_h # hx volume minus tube volume
+
+mcp_t_hx = 2*V_t_hx*rho_inconel*scp_t
 mcp_f_hx = scp_f*m_f_hx
 mcp_h_hxfh = m_h_hxfh*scp_h
 
-# mass flow rate of helium
-W_h_fh = F_hfh_h1*(0.1362)          # volumetric flow rate * denisty of helium at 180F, 2.2 H20, 7300 cfm ORNL-1845 p.122
 
 ###############################################################################
 # helium-water heat exchanger (fuel loop)
@@ -288,38 +331,48 @@ W_h_fh = F_hfh_h1*(0.1362)          # volumetric flow rate * denisty of helium a
 T0_hhwf_h1 = F_to_K(620)    # helium-water hx (fuel loop) helium inlet temp (K) ORNL-1845 pg. 121
 T0_hhwf_h2 = F_to_K(180)    # helium-water hx (fuel loop) helium outlet temp (K) ORNL-1845 pg. 121
 
-T0_hhwf_w1 = F_to_K(-61)    # helium-water hx (fuel loop) water inlet temp (K) ORNL-1845 pg. 121 
+T0_hhwf_w1 = F_to_K(61)    # helium-water hx (fuel loop) water inlet temp (K) ORNL-1845 pg. 121 
 T0_hhwf_w2 = F_to_K(124)   # helium-water hx (fuel loop) water water outlet temp (K) ORNL-1845 pg. 121
 
 T0_hhwf_t1 = ((T0_hhwf_h1+T0_hhwf_w1)/2)
 
 V_h_hxhw_US = (pi*((0.625/2)-0.049)**2)*825*12 # in^3 ORNL-1535 p.47
-V_h_hxhw = V_h_hxhw_US/61020 # m^3 
+V_h_hxhw = 2*V_h_hxhw_US/61020 # m^3 
 m_h_hxhw = V_h_hxhw*rho_h
 
-V_t_hxhw_US = ((pi*((0.625/2))**2)*825*12)-V_h_hxhw
+V_t_hxhw_US = 2*((pi*((0.625/2))**2)*825*12)-V_h_hxhw_US
 V_t_hxhw = V_t_hxhw_US/61020 # m^3
 m_t_hxhw = rho_inconel*V_t_hxhw
 mcp_t_hxhw = m_t_hxhw*scp_t
 
 # water mass flow rate
-W_hhwf_w = 998*((103)/15850)                 # water flow (kg/s) ORNL-1845 p.121
-V_w_US = (27*27.5*27)-V_t_hx_US-V_h_hxhw     # in^3
+W_hhwf_w = 998*((103*2)/15850)                 # water flow (kg/s) ORNL-1845 p.121
+W_hhwf_w_US = W_hhwf_w*2.205                 # (lb/s)
+V_w_US = 2*(27*27.5*27)-V_t_hx_US-V_h_hxhw_US  # in^3
 V_w = V_w_US/61020                           # in^3 -> m^3
-m_w = V_w*998/2 
+m_w = V_w*998 
 scp_w = 4.181e-3
 mcp_w = m_w*scp_w
 mcp_h_hxhw = m_h_hxhw*scp_h
 
-hA_h_US_hxhw = (3.22+2.37+1.40)/3 # ORNL-1535 p.47
-hA_w_US_hxhw = (30.8+22.8+12.5)/3 # ORNL-1535 p.47
-hA_t_US_hxhw = 1/0.00456          # ORNL-1535 p.47
+# heat transfer 
 
-hA_ht_US_hxhw = 1/((1/hA_h_US_hxhw)+(1/hA_t_US_hxhw))
-hA_tw_US_hxhw = 1/((1/hA_w_US_hxhw)+(1/hA_t_US_hxhw))
+# helium<->tube
+hxhw_h_p1 = Point(0.5,1.40)
+hxhw_h_p2 = Point(1.0,2.37)
+hxhw_h_p3 = Point(1.5,3.22)
+hA_h_hxhw_US = 2*hA(W_h_fh_US,[hxhw_h_p1,hxhw_h_p2,hxhw_h_p3])
+hA_t_hxhw_US = 2/0.00456 # BTU/(sec*degF)             # ORNL-1535 p.47
+hA_ht_hxhw_US = 1/((1/hA_h_hxhw_US)+(1/hA_t_hxhw_US))
+hA_ht_hxhw = hA_ht_hxhw_US*(5/9)*(1.05504)*(1e-3)     # BTU/(sec*degF) -> MW/C
 
-hA_ht_hxhw = hA_ht_US_hxhw*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
-hA_tw_hxhw = hA_tw_US_hxhw*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
+# tube<->water
+hxhw_w_p1 = Point(3.54,12.5)
+hxhw_w_p2 = Point(7.08,22.8)
+hxhw_w_p3 = Point(10.61,30.8)
+hA_w_hxhw_US = 2*hA(W_hhwf_w_US,[hxhw_w_p1,hxhw_w_p2,hxhw_w_p3])
+hA_tw_hxhw_US = 1/((1/hA_h_hxhw_US)+(1/hA_w_hxhw_US))
+hA_tw_hxhw = hA_tw_hxhw_US*(5/9)*(1.05504)*(1e-3)     # BTU/(sec*degF) -> MW/C
 
 ###############################################################################
 # coolant-helium heat exchanger 
@@ -334,22 +387,81 @@ T0_hch_h2 = F_to_K(1020)  # coolant-helium hx helium outlet temp (K) ORNL-1845 p
 
 T0_hch_t1 = ((T0_hch_c1+T0_hch_h1)/2)
 
-# heat transfer parameters
-m_c_hx = V_p_hx * rho_c
-mcp_h_c = m_c_hx*scp_c      
+# dimensions
+V_c_hxch_US = 2*101.6*12*pi*((1.0/2)-0.109)**2 # (in^3) ORNL-1535 p.58
+V_c_hxch = V_c_hxch_US/61020 # (in^3) -> (m^3)
+m_c_hx = V_c_hxch * rho_c
+mcp_h_c = m_c_hx*scp_c    
+
+V_t_hxch_US = 2*(101.6*12*pi*((1.0/2))**2)-V_c_hxch_US # (in^3) ORNL-1535 p.58
+V_t_hxch = V_t_hxch_US/61020 # (in^3) -> (m^3)
+m_t_hxch = V_t_hxch*rho_inconel
+mcp_t_hxch = m_t_hxch*scp_t
+
+V_h_hxch_US = 2*(16.25**2)*13.75 # (in^3) ORNL-1535 p.58
+V_h_hxch = V_h_hxch_US/61020 # (in^3) -> (m^3)
+m_h_hxch = rho_h*V_h_hxch 
+mcp_h_hxch = m_h_hxch*scp_h
 
 # helium mass flow rate 
 F_h_ch = 2000/2119 # ft^3/min->m^3/s ORNL-1845 p.122
 W_h_ch = F_h_ch*0.1389 # volumetric flow rate * denisty of helium at 170F, 4.0 H20 ORNL-1845 p.122
+W_hxch_h_US = W_h_ch*2.205                 # (kg/s)->(lb/s)
 
-#hA_c_hx_US = h_c_c_US*A_to_hx*10.764
-hA_c_hx_US = 5.724 # (BTU/(sec*degF)) ORNL-1535 p.47
-hA_ct_US_hx = 1/((1/hA_c_hx_US)+(1/hA_t_hx_US))  # BTU/(sec*degF)
+# coolant<->tube
+hA_c_hx_US = 2*17.3 # (BTU/(sec*degF)) ORNL-1535 p.58
+hA_t_hxch_US = 2/0.126 # (BTU/(sec*degF)) ORNL-1535 p.58
+hA_ct_US_hx = 1/((1/hA_c_hx_US)+(1/hA_t_hxch_US))  # BTU/(sec*degF)
 hA_ct_hx = hA_ct_US_hx*(5/9)*(1.05504)*(1e-3) # MW/C
+
+# tube<->helium
+hxch_h_p1 = Point(0.11,0.526)
+hxch_h_p2 = Point(0.22,0.743)
+hxch_h_p3 = Point(0.33,0.889)
+hA_h_hxch_US = 2*hA(W_hxch_h_US,[hxch_h_p1,hxch_h_p2,hxch_h_p3])  
+hA_th_hxch_US = 1/((1/hA_h_hxch_US)+(1/hA_t_hxch_US))
+hA_th_hxch = hA_th_hxch_US*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
 
 ###############################################################################
 # helium-water heat exchanger (coolant loop) 
 ###############################################################################
+
+# dimensions
+V_h_hxhwc_US = 2*(pi*((0.625/2)-0.049)**2)*255.1*12 # in^3 ORNL-1535 p.58
+V_h_hxhwc = V_h_hxhwc_US/61020 # (in^3) -> (m^3)
+m_h_hxhwc = rho_h*V_h_hxhwc
+mcp_h_hxhwc = m_h_hxhwc*scp_h
+
+V_t_hxhwc_US = 2*((pi*((0.625/2))**2)*255.1*12)-V_h_hxhwc_US # in^3 ORNL-1535 p.58
+V_t_hxhwc = V_t_hxhwc_US/61020 # (in^3) -> (m^3)
+m_t_hxhwc = V_t_hxhwc*scp_t
+mcp_t_hxhwc = m_t_hxhwc*scp_t
+
+V_w_hxhwc_US = 2*(17**3)-V_t_hxhwc_US-V_h_hxhwc_US # (in^3) ORNL-1535 p.58
+V_w_hxhwc = V_w_hxhwc_US/61020 # (in^3) -> (m^3)
+m_w_hxhwc = V_w_hxhwc*998
+mcp_w_hxhwc = m_w_hxhwc*scp_w
+
+# tube<->helium
+hxhwc_h_p1 = Point(0.11,0.424)
+hxhwc_h_p2 = Point(0.22,0.709)
+hxhwc_h_p3 = Point(0.33,0.957)
+hA_h_hxhwc_US = 2*hA(W_hxch_h_US,[hxhwc_h_p1,hxhwc_h_p2,hxhwc_h_p3])
+hA_t_hxhwc_US = 2/0.015 # ORNL-1535 p.58
+hA_ht_hxhwc_US = 1/((1/hA_h_hxhwc_US)+(1/hA_t_hxhwc_US))
+hA_ht_hxhwc =  hA_ht_hxhwc_US*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
+
+W_hhwc_w = 998*((38.3*2)/15850)  # water flow rate in helium-water hx (kg/s) ORNL-1845 p.122
+W_hhwc_w_US = W_hhwc_w*2.205 # (kg/s)->(lb/s)
+
+# tube<->water
+hxhwc_w_p1 = Point(3.33,5.92)
+hxhwc_w_p2 = Point(6.67,10.2)
+hxhwc_w_p3 = Point(10.0,14.3)
+hxhwc_w_p4 = Point(16.67,21.5)
+hA_w_hxhwc_US = 2*hA(W_hhwc_w_US,[hxhwc_w_p1,hxhwc_w_p2,hxhwc_w_p3,hxhwc_w_p4])
+hA_tw_hxhwc_US = 1/((1/hA_t_hxhwc_US)+(1/hA_w_hxhwc_US))
+hA_tw_hxhwc = hA_tw_hxhwc_US*(5/9)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
 
 # initial temperatures 
 T0_hhwc_h1 = F_to_K(1020)    # helium-water hx (coolant loop) helium inlet temp (K) ORNL-1845 pg. 122
@@ -360,7 +472,6 @@ T0_hhwc_w2 = F_to_K(100)   # helium-water hx (coolant loop) water water outlet t
 
 T0_hhwc_t1 = ((T0_hhwc_h1+T0_hhwc_w1)/2)
 
-W_hhwc_w = 998*(38.3/15850)  # water flow rate in helium-water hx (kg/s) ORNL-1845 p.122
 
 
 
