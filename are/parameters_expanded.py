@@ -31,10 +31,10 @@ scp_h = 1.248*4.1869e-3 # specigic heat capacity of helium (MJ/kg-C) ORNL-1845 p
 scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (MJ/kg-C) ORNL-1845 p.113
 
 # delays
-tau_hx_c_f = 1.00 # fuel-helium hx to core delay (unknown)
-tau_hx_c_c = 1.00 # coolant-helium hx to core delay (unknown)
-tau_c_hx_f = 1.00 # core->hx delay (unknown)
-tau_h = 0.5
+tau_hx_c_f = 0.5 # fuel-helium hx to core delay (unknown)
+tau_hx_c_c = 0.5 # coolant-helium hx to core delay (unknown)
+tau_c_hx_f = 0.5 # core->hx delay (unknown)
+tau_h = 0.01
 
 # wights
 # k_f1 = 0.465        # fractional power generation (fuel)
@@ -159,7 +159,7 @@ def hA(W,points):
 ###############################################################################
 
 # thermal feedback (1/Kelvin, temperature provided in Kelvin) ORNL-1845 pg. 115
-a_f = (-9.8E-5)*9/5
+a_f = (-18.8E-5)*9/5
 a_b = (1.1e-5)*9/5
 a_c = (-5.88e-5)*9/5
 
