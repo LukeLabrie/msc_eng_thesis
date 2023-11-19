@@ -159,7 +159,7 @@ def hA(W,points):
 ###############################################################################
 
 # thermal feedback (1/Kelvin, temperature provided in Kelvin) ORNL-1845 pg. 115
-a_f = (-20.8E-5)*9/5
+a_f = (-9.8E-5)*9/5
 a_b = (1.1e-5)*9/5
 a_c = (-5.88e-5)*9/5
 
