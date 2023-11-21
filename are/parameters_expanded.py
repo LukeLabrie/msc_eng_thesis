@@ -14,8 +14,8 @@ F = 1.0
 pi = math.pi
 R = 8.314            # ideal gas constant
 m_H = 0.004          # molar mass of helium (kg/mol)
-#P = 2.12             # steady-state power (MW) ORNL-1845 pg. 58
-P = 1.6             # steady-state power (MW) ORNL-1845 pg. 58
+P = 2.2             # steady-state power (MW) ORNL-1845 pg. 58
+#P = 100.6             # steady-state power (MW) ORNL-1845 pg. 58
 
 # density
 rho_inconel = 8.5*1000          # inconel density (kg/m^3)
@@ -31,10 +31,10 @@ scp_h = 1.248*4.1869e-3 # specigic heat capacity of helium (MJ/kg-C) ORNL-1845 p
 scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (MJ/kg-C) ORNL-1845 p.113
 
 # delays
-tau_hx_c_f = 10.0 # fuel-helium hx to core delay (unknown)
-tau_hx_c_c = 10.0 # coolant-helium hx to core delay (unknown)
-tau_c_hx_f = 10.0 # core->hx delay (unknown)
-tau_h = 0.01
+tau_hx_c_f = 2. # fuel-helium hx to core delay (unknown)
+tau_hx_c_c = 2. # coolant-helium hx to core delay (unknown)
+tau_c_hx_f = 2. # core->hx delay (unknown)
+tau_h = 0.5
 
 # wights
 # k_f1 = 0.465        # fractional power generation (fuel)
@@ -159,7 +159,7 @@ def hA(W,points):
 ###############################################################################
 
 # thermal feedback (1/Kelvin, temperature provided in Kelvin) ORNL-1845 pg. 115
-a_f = (-9.8E-5)*9/5
+a_f = (-9.8e-5)*9/5
 a_b = (1.1e-5)*9/5
 a_c = (-5.88e-5)*9/5
 
@@ -394,7 +394,7 @@ T0_hch_t1 = ((T0_hch_c1+T0_hch_h1)/2)
 V_c_hxch_US = 101.6*12*pi*((1.0/2)-0.109)**2 # (in^3) ORNL-1535 p.58
 V_c_hxch = V_c_hxch_US/61020 # (in^3) -> (m^3)
 m_c_hx = V_c_hxch * rho_c
-mcp_h_c = m_c_hx*scp_c    
+mcp_c_hxch = m_c_hx*scp_c    
 
 V_t_hxch_US = (101.6*12*pi*((1.0/2))**2)-V_c_hxch_US # (in^3) ORNL-1535 p.58
 V_t_hxch = V_t_hxch_US/61020 # (in^3) -> (m^3)
@@ -437,7 +437,7 @@ mcp_h_hxhwc = m_h_hxhwc*scp_h
 
 V_t_hxhwc_US = ((pi*((0.625/2))**2)*255.1*12)-V_h_hxhwc_US # in^3 ORNL-1535 p.58
 V_t_hxhwc = V_t_hxhwc_US/61020 # (in^3) -> (m^3)
-m_t_hxhwc = V_t_hxhwc*scp_t
+m_t_hxhwc = V_t_hxhwc*rho_inconel
 mcp_t_hxhwc = m_t_hxhwc*scp_t
 
 V_w_hxhwc_US = (17**3)-V_t_hxhwc_US-V_h_hxhwc_US # (in^3) ORNL-1535 p.58
