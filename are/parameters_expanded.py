@@ -7,6 +7,8 @@ from collections import namedtuple
 # constants
 ###############################################################################
 
+arbitrary_removal = 0.000
+
 # tweak heat flow 
 F = 1.0
 
@@ -31,9 +33,9 @@ scp_h = 1.248*4.1869e-3 # specigic heat capacity of helium (MJ/kg-C) ORNL-1845 p
 scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (MJ/kg-C) ORNL-1845 p.113
 
 # delays
-tau_hx_c_f = 2. # fuel-helium hx to core delay (unknown)
-tau_hx_c_c = 2. # coolant-helium hx to core delay (unknown)
-tau_c_hx_f = 2. # core->hx delay (unknown)
+tau_hx_c_f = 20. # fuel-helium hx to core delay (unknown)
+tau_hx_c_c = 20. # coolant-helium hx to core delay (unknown)
+tau_c_hx_f = 20. # core->hx delay (unknown)
 tau_h = 0.5
 
 # wights
@@ -46,16 +48,16 @@ k_1 = 0.5
 k_2 = 1-k_1
 
 # NEUTRONICS DATA
-tau_l = 20.0  # ORNL-TM-0728 %16.44; % (s)
+tau_l = 40.0  # ORNL-TM-0728 %16.44; % (s)
 tau_c = 8.3  # ORNL-1845 p.120
 #tau_l = 5.00  # ORNL-TM-0728 %16.44; % (s)
 #tau_c = 8.3  # ORNL-1845 p.120
 n_frac0 = 1.0  # initial fractional neutron density n/n0 (n/cm^3/s)
 # Lam = 2.400E-04  # mean generation time ORNL-TM-1070 p.15 U235
-Lam = 2.400E-04  # mean generation time ORNL-TM-1070 p.15 U235
+Lam = (2.400E-04)  # mean generation time ORNL-TM-1070 p.15 U235
 # Lam = 4.0E-04;  # mean generation time ORNL-TM-1070 p.15 U233
 lam = np.array([1.240E-02, 3.05E-02, 1.11E-01, 3.01E-01, 1.140E+00, 3.014E+00])
-beta = np.array([0.000223, 0.001457, 0.001307, 0.002628, 0.000766, 0.00023])  # U235
+beta = (np.array([0.000223, 0.001457, 0.001307, 0.002628, 0.000766, 0.00023]))  # U235
 # beta = np.array([0.00023, 0.00079, 0.00067, 0.00073, 0.00013, 0.00009])  # U233
 beta_t = np.sum(beta)  # total delayed neutron fraction MSRE
 rho_0 = beta_t-sum(np.divide(beta,1+np.divide(1-np.exp(-lam*tau_l),lam*tau_c))) # reactivity change in going from stationary to circulating fuel
@@ -159,9 +161,9 @@ def hA(W,points):
 ###############################################################################
 
 # thermal feedback (1/Kelvin, temperature provided in Kelvin) ORNL-1845 pg. 115
-a_f = (-9.8e-5)*9/5
-a_b = (1.1e-5)*9/5
-a_c = (-5.88e-5)*9/5
+a_f = (2*(-6.1e-5)*9/5)
+a_b = (-6.1e-5)*9/5
+a_c = ((-6.1e-5)*9/5)
 
 # operating conditions taken from 25-hr Xenon run Exp. H-8
 # temperatures 
