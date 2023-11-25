@@ -1,4 +1,4 @@
-# very close agreement, wide bounds
+# feedbacks, insertion, and beta_t
 a_f: -8.497785537606717e-05
 a_b: 1.98e-05
 a_c: 6.550691971743104e-05
