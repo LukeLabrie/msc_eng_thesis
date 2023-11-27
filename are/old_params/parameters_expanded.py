@@ -150,7 +150,7 @@ def hA(W,points):
     coeffs = np.linalg.solve(A, b)
 
     # evaluate terms
-    terms = [coeffs[i]**(order-i) for i in range(order)]
+    terms = [coeffs[i]*W**(order-i) for i in range(order)]
 
     return sum(terms)
 

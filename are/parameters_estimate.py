@@ -7,7 +7,7 @@ from collections import namedtuple
 # constants
 ###############################################################################
 
-arbitrary_removal = 0.000
+arbitrary_removal = 0
 
 # tweak heat flow 
 F = 1.0
@@ -150,7 +150,7 @@ def hA(W,points):
     coeffs = np.linalg.solve(A, b)
 
     # evaluate terms
-    terms = [coeffs[i]**(order-i) for i in range(order)]
+    terms = [coeffs[i]*W**(order-i) for i in range(order)]
 
     return sum(terms)
 
@@ -379,7 +379,7 @@ hxhw_w_p1 = Point(3.54,12.5)
 hxhw_w_p2 = Point(7.08,22.8)
 hxhw_w_p3 = Point(10.61,30.8)
 hA_w_hxhw_US = hA(W_hhwf_w_US,[hxhw_w_p1,hxhw_w_p2,hxhw_w_p3])
-hA_tw_hxhw_US = 1/((1/hA_h_hxhw_US)+(1/hA_w_hxhw_US))
+hA_tw_hxhw_US = 1/((1/hA_t_hxhw_US)+(1/hA_w_hxhw_US))
 hA_tw_hxhw = hA_tw_hxhw_US*(9/5)*(1.05504)*(1e-3)     # BTU/(sec*degF) -> MW/C
 
 ###############################################################################
