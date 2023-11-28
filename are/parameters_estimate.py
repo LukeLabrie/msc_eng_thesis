@@ -7,17 +7,16 @@ from collections import namedtuple
 # constants
 ###############################################################################
 
-arbitrary_removal = 0
+# debugging constants
 
-# tweak heat flow 
-F = 1.0
+arbitrary_removal = 0 # test effect of increased remvoal from system 
+F = 1.0               # tweak convective heat flow terms
 
 # dimensions
 pi = math.pi
 R = 8.314            # ideal gas constant
 m_H = 0.004          # molar mass of helium (kg/mol)
-P = 2.2             # steady-state power (MW) ORNL-1845 pg. 58
-#P = 100.6             # steady-state power (MW) ORNL-1845 pg. 58
+P = 2.2              # steady-state power (MW) ORNL-1845 pg. 58
 
 # density
 rho_inconel = 8.5*1000          # inconel density (kg/m^3)
@@ -25,27 +24,18 @@ rho_h = 0.167                   # helium density (kg/m^3) NEEDS TO BE TEMPERATUR
 rho_m = 2.75*1000               # BeO density (kg/m^3) ORNL-1845 p.
 
 # specific heat capacities 
-#scp_f = 1.9665e-3       # specific heat capacity of fuel salt (MJ/kg-C) ORNL-TM-0728 p.8
-scp_t = 0.101*4.1869e-3 # specific heat capacity of inconel 600 (MJ/kg-C) ORNL-1845 p.113
-scp_f = 0.26*4.1869e-3  # ORNL-1845 p.113
-scp_c = 0.3*4.1869e-3   # specific heat capacity of cooolant (MJ/kg-C) ORNL-1845 p.113
-scp_h = 1.248*4.1869e-3 # specigic heat capacity of helium (MJ/kg-C) ORNL-1845 p.113
-scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (MJ/kg-C) ORNL-1845 p.113
+#scp_f = 1.9665e-3       # specific heat capacity of fuel salt (BTU/lb*defF) -> (MJ/kg-C) ORNL-TM-0728 p.8
+scp_t = 0.101*4.1869e-3 # specific heat capacity of inconel 600 (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
+scp_f = 0.26*4.1869e-3  # specific heat capacity of fuel salt ORNL-1845 p.113 (BTU/lb*defF) -> (MJ/kg-C)
+scp_c = 0.3*4.1869e-3   # specific heat capacity of cooolant (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
+scp_h = 1.248*4.1869e-3 # specigic heat capacity of helium (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
+scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
 
 # delays
 tau_hx_c_f = 20. # fuel-helium hx to core delay (unknown)
 tau_hx_c_c = 20. # coolant-helium hx to core delay (unknown)
 tau_c_hx_f = 20. # core->hx delay (unknown)
-tau_h = 0.5
-
-# wights
-# k_f1 = 0.465        # fractional power generation (fuel)
-# k_f2 = 0.465        # fractional power generation (fuel)
-k_f1 = 0.475       # fractional power generation (fuel)
-k_f2 = 0.475        # fractional power generation (fuel)
-k_m = 1-(k_f1+k_f2) # fractional power generation (beryllium)
-k_1 = 0.5
-k_2 = 1-k_1
+tau_h = 0.5      # helium loop delay (unknown)
 
 # NEUTRONICS DATA
 tau_l = 40.0  # ORNL-TM-0728 %16.44; % (s)
@@ -160,10 +150,14 @@ def hA(W,points):
 # core
 ###############################################################################
 
+# wights
+k_f1 = 0.475       # fractional power generation (fuel)
+k_f2 = 0.475        # fractional power generation (fuel)
+k_m = 1-(k_f1+k_f2) # fractional power generation (beryllium)
+k_1 = 0.5
+k_2 = 1-k_1
+
 # thermal feedback (1/Kelvin, temperature provided in Kelvin) ORNL-1845 pg. 115
-#a_f = ((-6.1e-5)*9/5)
-#a_b = (-6.1e-5)*9/5
-#a_c = ((-6.1e-5)*9/5)
 a_f = (-9.8e-5)*9/5
 a_b = (1.1e-5)*9/5
 a_c = (-5.88e-5)*9/5
@@ -171,50 +165,39 @@ a_c = (-5.88e-5)*9/5
 # operating conditions taken from 25-hr Xenon run Exp. H-8
 # temperatures 
 T_fuel_avg = F_to_K(1311)       # ORNL 1845 pg. 58
-
 T0_c_f1 = F_to_K(1209)          # core fuel inlet temp (K) ORNL-1845 pg. 120
 T0_c_f2 = F_to_K(1522)          # core fuel outlet temp (K) ORNL-1845 pg. 120
-#T0_c_f1 = F_to_K(1150)          # core fuel inlet temp (K) ORNL-1845 pg. 120
-#T0_c_f2 = F_to_K(1450)          # core fuel outlet temp (K) ORNL-1845 pg. 120
-
 T0_c_c1 = F_to_K(1226)          # core coolant inlet temp (K) ORNL-1845 pg. 121
 T0_c_c2 = F_to_K(1335)          # core coolant outlet temp (K) ORNL-1845 pg. 121
-
 T0_c_t1 = ((T0_c_f1+T0_c_c1)/2) # core tube temp
-
-T0_c_m = F_to_K(1300)            # beryllium initial temp
+T0_c_m = F_to_K(1300)           # beryllium initial temp
 
 # flow rates 
 F_c_f = 46/15850       # core fuel flow rate (gal/min)->(m^3/s) ORNL-1845 pg. 120
 F_c_c = 152/15850      # core coolant flow rate (gal/min)->(m^3/s) ORNL-1845 pg. 121
 
 # dimensions
-V_fuel = 52071.248849/1e6                  # CAD model (cm^3)->(m^3)
-A_fuel = (69872.856584/2-(6*6.996))/10000  # CAD model (cm^3)->(m^2) 
-V_tubes = (5453.961+34777.657)/1e6                     # CAD model (cm^3)->(m^3)
-A_tubes = (73445.338-(12*7.728))/10000     # CAD model (cm^3)->(m^2)
-A_tube_bends = 2*(20044.557-(62*pi*(3.137/2)**2))/10000     # CAD model (m^2) 
-V_coolant = (248933.207)/1e6            # CAD model (m^3)
-
-A_mc = 961677.131/10000 # CAD model (m^2)
-V_m = 926899.473/1e6 # CAD model (m^3)
+V_fuel = 52071.248849/1e6                                # CAD model (cm^3)->(m^3)
+A_fuel = (69872.856584/2-(6*6.996))/10000                # CAD model (cm^3)->(m^2) 
+V_tubes = (5453.961+34777.657)/1e6                       # CAD model (cm^3)->(m^3)
+A_tubes = (73445.338-(12*7.728))/10000                   # CAD model (cm^3)->(m^2)
+A_tube_bends = 2*(20044.557-(62*pi*(3.137/2)**2))/10000  # CAD model (cm^2)->(m^2) 
+V_coolant = (248933.207)/1e6                             # CAD model (cm^3)->(m^3)
+A_mc = 961677.131/10000                                  # CAD model (cm^2)->(m^2)
+V_m = 926899.473/1e6                                     # CAD model (cm^2)->(m^3)
 
 # density 
-rho_c = 1000*0.78                # coolant density (kg/m^3) 
+rho_c = 1000*0.78  # coolant density (kg/m^3) 
 
 # mass
 m_f_c = fuel_density(T_fuel_avg)*V_fuel
-m_c_c = rho_c*V_coolant      # coolant mass (kg)
-m_m_c = (5490/2.205)  # ORNL-1845 p.111s (kg)
-
+m_c_c = rho_c*V_coolant         # coolant mass (kg)
+m_m_c = (5490/2.205)            # ORNL-1845 p.111s (lb)->(kg)
+m_t     = V_tubes*rho_inconel   # mass of tubes (kg)  
 
 # mass flow rate 
 W_f = F_c_f * fuel_density(T_fuel_avg)   # fuel mass flow rate (kg/s)
 W_c = F_c_c * rho_c                      # coolant mass flow rate (kg/s)
-
-# heat transfer
-# h_ft = 6.480e-01  # heat transfer*area coefficient from primary to tubes (MW/C) ORNL-TM-1647 p.3
-
 
 # convective heat transfer coefficient for the core fuel
 rho_c_f = 187                           # core fuel density in (lb/ft^3) ORNL-1535 p.16
@@ -241,21 +224,18 @@ h_t_US = (hA_t_hx_US/11.15+hA_t_hx_US/8.02)/2 # tube htc (Btu/(sec*ft^2*defF))
 hA_t_c_US = h_t_US*A_fuel*10.764
 hA_t_c = hA_t_c_US*(9/5)*(1.05504)*(1e-3)  # MW/(degK)
 
-# fuel-tube coefficient
+# fuel-tube coefficient (core)
 hA_ft_c = 1/((1/hA_t_c)+(1/hA_f_c))
 
 # coolant
 A_coolant_tubes_US = 317085/929      # CAD model (cm^2)->(ft^2)
-h_c_c_US = 166 # coolant heat transfer coefficient (BTU/(hr*ft^2*defF)) ORNL-1535 p.23
+h_c_c_US = 166                       # coolant heat transfer coefficient (BTU/(hr*ft^2*defF)) ORNL-1535 p.23
 hA_c_c_US = A_coolant_tubes_US*h_c_c_US
- 
-# hA_c_c_US = 1000*1/0.238     # ORNL-1535 pg.24
-#hA_c_c_US = h_c     # ORNL-1535 pg.24
 
 # elbows
-hA_t_c12_US = 1/(0.130) # ORNL-1535 pg.24
+hA_t_c12_US = 1/(0.130)                       # ORNL-1535 pg.24
 hA_tc_c_US = 1/((1/hA_c_c_US)+(1/hA_t_c12_US)) 
-hA_tc_c = hA_tc_c_US*(9/5)*(1.05504)*(1e-3)  # MW/(degK)
+hA_tc_c = hA_tc_c_US*(9/5)*(1.05504)*(1e-3)   # MW/(degK)
 
 # moderator
 hA_m_US = 1/2.060 # ORNL-1535 p.28
@@ -263,13 +243,11 @@ hA_c_US = 1000*1/0.771 # ORNL-1535 p.28
 hA_mc_US = 1/((1/hA_m_US)+(1/hA_c_US))
 hA_mc_c = hA_mc_US*(9/5)*(1.05504)*(1e-3)  # MW/(degK)
 
-# mass and specific heat 
-m_t     = V_tubes*rho_inconel   # mass of tubes (kg)  
-mcp_t_c   = m_t*scp_t;          # from ratio of (A_phe/mcp_t)msbr = (A_phe/mcp_t)msre m_tn*cp_tn; % mass*(heat capacity) of tubes per lump in MW-s/°C 
+# specific heat 
+mcp_t_c = scp_t*m_t
 mcp_f_c = scp_f*m_f_c
 mcp_c_c = scp_c*m_c_c 
 mcp_m_c = scp_m*m_m_c
-
 
 ###############################################################################
 # fuel-helium heat exchanger
@@ -299,6 +277,7 @@ A_to_hx = (pi*(1.0/2)*93.65*12)/144 # hx outer tube area (in^2 -> ft^2) ORNL-153
 
 # mass 
 m_f_hx = V_p_hx*fuel_density(T_fuel_avg)
+m_h_hxfh = (((27.0*27.5*27)/61020)-V_t_hx-V_p_hx)*rho_h # hx volume minus tube volume
 
 # heat transfer fuel<->tube
 hA_f_hx_US = 5.724   # BTU/(sec*degF) ORNL-1535 p.47
@@ -319,12 +298,6 @@ fh_p3 = Point(1.5,0.955)
 hA_h_hx_US = hA(W_h_fh_US,[fh_p1,fh_p2,fh_p3])
 hA_ht_hx_US = 1/((1/hA_h_hx_US)+(1/hA_t_hx_US))
 hA_ht_hx = hA_ht_hx_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> (MW/C)
-
-#hA_h_US_hx = (0.955+0.800+0.580)/3         # ORNL-1535 p.47 (average)
-#hA_ht_US_hx = 1/((1/hA_t_hx_US)+(1/hA_h_US_hx))  # BTU/(sec*degF)
-#hA_th_hx = hA_ht_US_hx*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
-
-m_h_hxfh = (((27.0*27.5*27)/61020)-V_t_hx-V_p_hx)*rho_h # hx volume minus tube volume
 
 mcp_t_hx = V_t_hx*rho_inconel*scp_t
 mcp_f_hx = scp_f*m_f_hx
