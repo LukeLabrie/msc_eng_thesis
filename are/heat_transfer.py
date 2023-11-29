@@ -1,4 +1,4 @@
-from jitcdde import jitcdde, y, t, jitcdde_input, input
+from jitcdde import y 
 
 # heat transfer functions
 def dT_convective(a: list, b: y, hA_mcp: list):

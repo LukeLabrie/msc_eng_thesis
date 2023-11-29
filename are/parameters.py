@@ -7,8 +7,16 @@ from collections import namedtuple
 # constants
 ###############################################################################
 
-# debugging constants
+# domain
+tf = 1000.00
+T = np.arange(0.0,tf,0.01)
 
+# reactivity insertion
+inserted = 4e-3
+insert_duration = 0.4/0.011 # ORNL-1845
+t_ins = 300.00
+
+# debugging constants
 arbitrary_removal = 0 # test effect of increased remvoal from system 
 F = 1.0               # tweak convective heat flow terms
 
@@ -289,8 +297,6 @@ hA_ft_hx = hA_ft_hx_US*(9/5)*(1.05504)*(1e-3)
 W_h_fh = F_hfh_h1*(0.1362) # (kg/s) = volumetric flow rate * denisty of helium at 180F, 2.2 H20, 7300 cfm ORNL-1845 p.122
 W_h_fh_US = W_h_fh*2.205   # (lb/s)
 
-# heat transfer tube<->helium
-
 # available coefficient data for helium ORNL-1535 p.47 
 fh_p1 = Point(0.5,0.58)
 fh_p2 = Point(1.0,0.8)
@@ -299,10 +305,10 @@ hA_h_hx_US = hA(W_h_fh_US,[fh_p1,fh_p2,fh_p3])
 hA_ht_hx_US = 1/((1/hA_h_hx_US)+(1/hA_t_hx_US))
 hA_ht_hx = hA_ht_hx_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> (MW/C)
 
+# product of mass and specific heat capacities 
 mcp_t_hx = V_t_hx*rho_inconel*scp_t
 mcp_f_hx = scp_f*m_f_hx
 mcp_h_hxfh = m_h_hxfh*scp_h
-
 
 ###############################################################################
 # helium-water heat exchanger (fuel loop)
@@ -335,8 +341,6 @@ m_w = V_w*998
 scp_w = 4.181e-3
 mcp_w = m_w*scp_w
 mcp_h_hxhw = m_h_hxhw*scp_h
-
-# heat transfer 
 
 # helium<->tube
 hxhw_h_p1 = Point(0.5,1.40)
@@ -371,18 +375,20 @@ T0_hch_t1 = ((T0_hch_c1+T0_hch_h1)/2)
 # dimensions
 V_c_hxch_US = 101.6*12*pi*((1.0/2)-0.109)**2 # (in^3) ORNL-1535 p.58
 V_c_hxch = V_c_hxch_US/61020 # (in^3) -> (m^3)
-m_c_hx = V_c_hxch * rho_c
-mcp_c_hxch = m_c_hx*scp_c    
-
 V_t_hxch_US = (101.6*12*pi*((1.0/2))**2)-V_c_hxch_US # (in^3) ORNL-1535 p.58
 V_t_hxch = V_t_hxch_US/61020 # (in^3) -> (m^3)
-m_t_hxch = V_t_hxch*rho_inconel
-mcp_t_hxch = m_t_hxch*scp_t
-
 V_h_hxch_US = (16.25**2)*13.75 # (in^3) ORNL-1535 p.58
 V_h_hxch = V_h_hxch_US/61020 # (in^3) -> (m^3)
+
+# mass
+m_c_hx = V_c_hxch * rho_c
+m_t_hxch = V_t_hxch*rho_inconel
 m_h_hxch = rho_h*V_h_hxch 
+
+# product of mass and specific heat capacity
+mcp_c_hxch = m_c_hx*scp_c    
 mcp_h_hxch = m_h_hxch*scp_h
+mcp_t_hxch = m_t_hxch*scp_t
 
 # helium mass flow rate 
 F_h_ch = 2000/2119 # ft^3/min->m^3/s ORNL-1845 p.122
@@ -407,20 +413,31 @@ hA_th_hxch = hA_th_hxch_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
 # helium-water heat exchanger (coolant loop) 
 ###############################################################################
 
+# initial temperatures 
+T0_hhwc_h1 = F_to_K(1020)    # helium-water hx (coolant loop) helium inlet temp (K) ORNL-1845 pg. 122
+T0_hhwc_h2 = F_to_K(170)    # helium-water hx (coolant loop) helium outlet temp (K) ORNL-1845 pg. 122
+
+T0_hhwc_w1 = F_to_K(70)    # helium-water hx (coolant loop) water inlet temp (K) ORNL-1845 pg. 121 
+T0_hhwc_w2 = F_to_K(100)   # helium-water hx (coolant loop) water water outlet temp (K) ORNL-1845 pg. 121
+
+T0_hhwc_t1 = ((T0_hhwc_h1+T0_hhwc_w1)/2)
+
 # dimensions
 V_h_hxhwc_US = (pi*((0.625/2)-0.049)**2)*255.1*12 # in^3 ORNL-1535 p.58
 V_h_hxhwc = V_h_hxhwc_US/61020 # (in^3) -> (m^3)
-m_h_hxhwc = rho_h*V_h_hxhwc
-mcp_h_hxhwc = m_h_hxhwc*scp_h
-
 V_t_hxhwc_US = ((pi*((0.625/2))**2)*255.1*12)-V_h_hxhwc_US # in^3 ORNL-1535 p.58
 V_t_hxhwc = V_t_hxhwc_US/61020 # (in^3) -> (m^3)
-m_t_hxhwc = V_t_hxhwc*rho_inconel
-mcp_t_hxhwc = m_t_hxhwc*scp_t
-
 V_w_hxhwc_US = (17**3)-V_t_hxhwc_US-V_h_hxhwc_US # (in^3) ORNL-1535 p.58
 V_w_hxhwc = V_w_hxhwc_US/61020 # (in^3) -> (m^3)
+
+# mass
+m_h_hxhwc = rho_h*V_h_hxhwc
+m_t_hxhwc = V_t_hxhwc*rho_inconel
 m_w_hxhwc = V_w_hxhwc*998
+
+# product of mass and specific heat capacity
+mcp_h_hxhwc = m_h_hxhwc*scp_h
+mcp_t_hxhwc = m_t_hxhwc*scp_t
 mcp_w_hxhwc = m_w_hxhwc*scp_w
 
 # tube<->helium
@@ -432,6 +449,7 @@ hA_t_hxhwc_US = 1/0.015 # ORNL-1535 p.58
 hA_ht_hxhwc_US = 1/((1/hA_h_hxhwc_US)+(1/hA_t_hxhwc_US))
 hA_ht_hxhwc =  hA_ht_hxhwc_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
 
+# mass flow 
 W_hhwc_w = 998*((38.3*2)/15850)  # water flow rate in helium-water hx (kg/s) ORNL-1845 p.122
 W_hhwc_w_US = W_hhwc_w*2.205 # (kg/s)->(lb/s)
 
@@ -444,14 +462,6 @@ hA_w_hxhwc_US = hA(W_hhwc_w_US,[hxhwc_w_p1,hxhwc_w_p2,hxhwc_w_p3,hxhwc_w_p4])
 hA_tw_hxhwc_US = 1/((1/hA_t_hxhwc_US)+(1/hA_w_hxhwc_US))
 hA_tw_hxhwc = hA_tw_hxhwc_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
 
-# initial temperatures 
-T0_hhwc_h1 = F_to_K(1020)    # helium-water hx (coolant loop) helium inlet temp (K) ORNL-1845 pg. 122
-T0_hhwc_h2 = F_to_K(170)    # helium-water hx (coolant loop) helium outlet temp (K) ORNL-1845 pg. 122
-
-T0_hhwc_w1 = F_to_K(70)    # helium-water hx (coolant loop) water inlet temp (K) ORNL-1845 pg. 121 
-T0_hhwc_w2 = F_to_K(100)   # helium-water hx (coolant loop) water water outlet temp (K) ORNL-1845 pg. 121
-
-T0_hhwc_t1 = ((T0_hhwc_h1+T0_hhwc_w1)/2)
 
 
 

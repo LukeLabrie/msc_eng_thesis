@@ -2,7 +2,7 @@
 from variables import *
 from jitcdde import t, jitcdde_input, input
 from heat_transfer import *
-from parameters_estimate import *
+from parameters import *
 from chspy import CubicHermiteSpline
 
 def relax_feedback_insertion_beta(params):
