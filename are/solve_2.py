@@ -19,7 +19,7 @@ class Node:
         self.internal = 0.0
         self.convective = 0.0
         self.T0 = 0.0
-        self.T = None           # temperature (K), to be assigned by System class
+        self.T = None           # temperature (K), to be assigned by system class
     
     def set_dTdt_BulkFlow(self, source: y, dumped: bool = False):
         '''
@@ -65,46 +65,22 @@ class Node:
           return sum
 
 
-class System:
-     def __init__(self) -> None:
-          self.nNodes = 0
-          self.nodes = []
-
-     def addNodes(self, newNodes: list):
-          index = self.nNodes
-          add = []
-          for n in newNodes: 
-                n.T = lambda tau=None, i = index: y(i, tau) if tau is not None else y(i)
-                self.nodes.append(n)
-          nNodes += 1
-          return None
-
-# ARE system        
-ARE = System()
-
-# nodes to add to system 
-nodesARE = []
-
 # core nodes 
 c_f1 = Node(m = m_f_c/2, W = W_f, T0 = T0_c_f1)
 c_f2 = Node(m = m_f_c/2, W = W_f, T0 = T0_c_f1)
-c_t1 = Node(T0 = T0_c_t1)
-c_c1 = Node(m = m_c_c/2, W = W_c, T0 = T0_c_c1)
-c_c1 = Node(m = m_c_c/2, W = W_c, T0 = T0_c_c2) 
-c_m1 = Node(T0 = T0_c_m)
 
 
-# continue defining nodes
-# then system will assign indicies to lamda functions
+# ARE.addNode(c_f1)
 
-c_f1.set_dTdt_BulkFlow(source = (hx_fh1_f2(t-tau_hx_c_f)+hx_fh2_f2(t-tau_hx_c_f))/2) 
-c_f1.set_dTdt_Internal(n = n(), P = P, mcp = mcp_f_c, k = k_f1)
-c_f1.set_dTdt_convective(source = [c_t1()], hA_mcp = [hA_ft_c/mcp_f_c])
+# c_f1.set_dTdt_BulkFlow(source = (hx_fh1_f2(t-tau_hx_c_f)+hx_fh2_f2(t-tau_hx_c_f))/2) 
+# c_f1.set_dTdt_Internal(n = n(), P = P, mcp = mcp_f_c, k = k_f1)
+# c_f1.set_dTdt_convective(source = [c_t1()], hA_mcp = [hA_ft_c/mcp_f_c])
 
-# %%
+
+
 dc_f2 = dT_bulkFlow(W_f, m_f_c/2, T_c_f1(), c_f2()) + \
         dT_internal(k_f1, P, mcp_f_c, n()) + \
-        dT_convective([c_t1.T],c_f2(),[hA_ft_c/mcp_f_c])
+        dT_convective([c_t1()],c_f2(),[hA_ft_c/mcp_f_c])
 
 # tubes
 dc_t1= dT_convective([T_c_f1(),c_f2(),c_c1(),c_c2()],c_t1(),[hA_ft_c/mcp_t_c,hA_ft_c/mcp_t_c,hA_tc_c/mcp_t_c,hA_tc_c/mcp_t_c])
@@ -117,7 +93,7 @@ dc_c2 = dT_bulkFlow(W_c,m_c_c/2,c_c1(),c_c2()) + \
         dT_convective([c_t1(),c_m()],c_c2(),[hA_tc_c/mcp_c_c,hA_mc_c/mcp_c_c])
 
 # moderator 
-dc_m1 =  dT_internal(k_m,P,mcp_m_c,n()) + \
+dc_m =  dT_internal(k_m,P,mcp_m_c,n()) + \
         dT_convective([c_c1(),c_c2()],c_m(),[hA_mc_c/mcp_m_c,hA_mc_c/mcp_m_c])
 
 dc_f2 = dT_bulkFlow(W_f, m_f_c/2, T_c_f1(), c_f2()) +                                             dT_internal(k_f1, P, mcp_f_c, n()) + dT_convective([c_t1()],c_f2(),[hA_ft_c/mcp_f_c]) 
