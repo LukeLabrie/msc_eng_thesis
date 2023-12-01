@@ -173,4 +173,10 @@ ARE.addNodes([c_f1,dc_f2,dc_t1,dc_c1,dc_c2,dc_m,
 # define dynamics
 c_f1.set_dTdt_BulkFlow(source = (hx_fh1_f2.y(t-tau_hx_c_f)+hx_fh2_f2.y(t-tau_hx_c_f))/2) 
 c_f1.set_dTdt_Internal(source = n.y, k = k_f1*P/mcp_f_c)
-c_f1.set_dTdt_convective(source = [c_t1()], hA_mcp = [hA_ft_c/mcp_f_c])
+c_f1.set_dTdt_convective(source = [c_t1.y], hA_mcp = [hA_ft_c/mcp_f_c])
+
+c_f2.set_dTdt_BulkFlow(source = c_f1.y) 
+c_f2.set_dTdt_Internal(source = n.y, k = k_f2*P/mcp_f_c)
+c_f2.set_dTdt_convective(source = [c_t1.y], hA_mcp = [hA_ft_c/mcp_f_c])
+
+# try with a minimal example
