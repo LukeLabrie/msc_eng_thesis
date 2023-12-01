@@ -1,6 +1,6 @@
 from jitcdde import y
 
-T_c_f1 = lambda tau=None: y(0, tau) if tau is not None else y(0)
+# T_c_f1 = lambda tau=None: y(0, tau) if tau is not None else y(0)
 # T_c_f2 = lambda tau=None: y(7, tau) if tau is not None else y(7)
 # T_c_t1 = lambda tau=None: y(8, tau) if tau is not None else y(8)
 # T_c_c1 = lambda tau=None: y(9, tau) if tau is not None else y(9)

@@ -264,10 +264,8 @@ mcp_m_c = scp_m*m_m_c
 # initial temperatures
 T0_hfh_f1 = F_to_K(1450)   # fuel-helium hx fuel inlet temp (K) ORNL-1845 pg. 121
 T0_hfh_f2 = F_to_K(1150)   # fuel-helium hx fuel oulet temp (K) ORNL-1845 pg. 121
-
 T0_hfh_h1 = F_to_K(180)    # fuel-helium hx helium inlet temp (K) ORNL-1845 pg. 121
 T0_hfh_h2 = F_to_K(620)    # fuel-helium hx helium outlet temp (K) ORNL-1845 pg. 121
-
 T0_hfh_t1 = ((T0_hfh_f1+T0_hfh_h1)/2) # initial tube temp
 
 # flow rates 
@@ -286,6 +284,7 @@ A_to_hx = (pi*(1.0/2)*93.65*12)/144 # hx outer tube area (in^2 -> ft^2) ORNL-153
 # mass 
 m_f_hx = V_p_hx*fuel_density(T_fuel_avg)
 m_h_hxfh = (((27.0*27.5*27)/61020)-V_t_hx-V_p_hx)*rho_h # hx volume minus tube volume
+m_t_hxfh = V_t_hx*rho_inconel
 
 # heat transfer fuel<->tube
 hA_f_hx_US = 5.724   # BTU/(sec*degF) ORNL-1535 p.47
@@ -306,7 +305,7 @@ hA_ht_hx_US = 1/((1/hA_h_hx_US)+(1/hA_t_hx_US))
 hA_ht_hx = hA_ht_hx_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> (MW/C)
 
 # product of mass and specific heat capacities 
-mcp_t_hx = V_t_hx*rho_inconel*scp_t
+mcp_t_hx = m_t_hxfh*scp_t
 mcp_f_hx = scp_f*m_f_hx
 mcp_h_hxfh = m_h_hxfh*scp_h
 

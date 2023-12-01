@@ -93,13 +93,40 @@ c_c1 = Node(m = m_c_c/2, W = W_c, T0 = T0_c_c1)
 c_c1 = Node(m = m_c_c/2, W = W_c, T0 = T0_c_c2) 
 c_m1 = Node(T0 = T0_c_m)
 
+# hx fuel->helium 1
+hx_fh1_f1 = Node(m = m_f_hx, W = W_f, T0 = T0_hfh_f1)
+hx_fh1_f1 = Node(m = m_f_hx, W = W_f, T0 = T0_hfh_f2)
+hx_fh1_t1 = Node(m = m_t_hxfh, T0 = T0_hfh_t1)
+hx_fh1_h1 = Node(m = m_h_hxfh/2, W = W_h_fh, T0 = T0_hfh_h1)
+hx_fh1_h2 = Node(m = m_h_hxfh/2, W = W_h_fh, T0 = T0_hfh_h2) 
 
-# continue defining nodes
-# then system will assign indicies to lamda functions
+# hx fuel->helium 2
+hx_fh2_f1 = Node(m = m_f_hx, W = W_f, T0 = T0_hfh_f1)
+hx_fh2_f1 = Node(m = m_f_hx, W = W_f, T0 = T0_hfh_f2)
+hx_fh2_t1 = Node(m = m_t_hxfh, T0 = T0_hfh_t1)
+hx_fh2_h1 = Node(m = m_h_hxfh/2, W = W_h_fh, T0 = T0_hfh_h1)
+hx_fh2_h2 = Node(m = m_h_hxfh/2, W = W_h_fh, T0 = T0_hfh_h2) 
 
-c_f1.set_dTdt_BulkFlow(source = (hx_fh1_f2(t-tau_hx_c_f)+hx_fh2_f2(t-tau_hx_c_f))/2) 
-c_f1.set_dTdt_Internal(n = n(), P = P, mcp = mcp_f_c, k = k_f1)
-c_f1.set_dTdt_convective(source = [c_t1()], hA_mcp = [hA_ft_c/mcp_f_c])
+# hx coolant->helium 1
+hx_ch1_c1 = Node(m = m_c_hx, W = W_c, T0 = T0_hch_c1)
+hx_ch1_c2 = Node(m = m_c_hx, W = W_c, T0 = T0_hch_c2)
+hx_ch1_t1 = Node(m = m_t_hxch, T0 = T0_hch_t1)
+hx_ch1_h1 = Node(m = m_h_hxch/2, W = W_c, T0 = T0_hch_h1)
+hx_ch1_h2 = Node(m = m_h_hxch/2, W = W_c, T0 = T0_hch_h2)
+
+# hx coolant->helium 2
+hx_ch2_c1 = Node(m = m_c_hx, W = W_c, T0 = T0_hch_c1)
+hx_ch2_c2 = Node(m = m_c_hx, W = W_c, T0 = T0_hch_c2)
+hx_ch2_t1 = Node(m = m_t_hxch, T0 = T0_hch_t1)
+hx_ch2_h1 = Node(m = m_h_hxch/2, W = W_c, T0 = T0_hch_h1)
+hx_ch2_h2 = Node(m = m_h_hxch/2, W = W_c, T0 = T0_hch_h2)
+
+# hx helium->water 1, fuel loop
+hx_hwf1_h1 = Node(m = m_h_hxhw/2, W = W_h_fh, T0 = T0_hhwf_h1)
+hx_hwf1_h2 = Node(m = m_h_hxhw/2, W = W_h_fh, T0 = T0_hhwf_h2)
+hx_hwf1_t1 = Node(m = m_t_hxhw, T0 = T0_hhwf_t1)
+
+
 
 # %%
 dc_f2 = dT_bulkFlow(W_f, m_f_c/2, T_c_f1(), c_f2()) + \
@@ -133,6 +160,7 @@ dc_c2 = dT_bulkFlow(W_c,m_c_c/2,c_c1(),c_c2()) +                                
 dc_m =  dT_internal(k_m,P,mcp_m_c,n()) + F*dT_convective([c_c1(),c_c2()],c_m(),[hA_mc_c/mcp_m_c,hA_mc_c/mcp_m_c])
 
 
+
 # %%
 # FUEL-HELIUM HX1
 dhx_fh1_f1 = dT_bulkFlow(W_f,m_f_hx,c_f2(t-tau_c_hx_f),hx_fh1_f1()) + F*dT_convective([hx_fh1_t1()],hx_fh1_f1(),[hA_ft_hx/mcp_f_hx]) 
@@ -142,8 +170,8 @@ dhx_fh1_f2 = dT_bulkFlow(W_f,m_f_hx,hx_fh1_f1(),hx_fh1_f2()) +        F*dT_conve
 dhx_fh1_t1 = dT_convective([hx_fh1_f1(),hx_fh1_f2(),hx_fh1_h1(),hx_fh1_h2()],hx_fh1_t1(),[h/mcp_t_hx for h in [hA_ft_hx,hA_ft_hx,hA_ht_hx,hA_ht_hx]])
 
 # Helium
-dhx_fh1_h1 = dT_bulkFlow(W_h_fh,m_h_hxfh,hx_hwf2_h2(t-tau_h),hx_fh1_h1()) + F*dT_convective([hx_fh1_t1()],hx_fh1_h1(),[hA_ht_hx/mcp_h_hxfh])
-dhx_fh1_h2 = dT_bulkFlow(W_h_fh,m_h_hxfh,hx_fh1_h1(),hx_fh1_h2()) +         F*dT_convective([hx_fh1_t1()],hx_fh1_h2(),[hA_ht_hx/mcp_h_hxfh])
+dhx_fh1_h1 = dT_bulkFlow(W_h_fh,m_h_hxfh/2,hx_hwf2_h2(t-tau_h),hx_fh1_h1()) + F*dT_convective([hx_fh1_t1()],hx_fh1_h1(),[hA_ht_hx/mcp_h_hxfh])
+dhx_fh1_h2 = dT_bulkFlow(W_h_fh,m_h_hxfh/2,hx_fh1_h1(),hx_fh1_h2()) +         F*dT_convective([hx_fh1_t1()],hx_fh1_h2(),[hA_ht_hx/mcp_h_hxfh])
 
 # FUEL-HELIUM HX2 Fuel Nodes
 dhx_fh2_f1 = dT_bulkFlow(W_f,m_f_hx,c_f2(t-tau_c_hx_f), hx_fh2_f1()) + F*dT_convective([hx_fh2_t1()],hx_fh2_f1(),[hA_ft_hx/mcp_f_hx])
@@ -153,10 +181,10 @@ dhx_fh2_f2 = dT_bulkFlow(W_f,m_f_hx,hx_fh2_f1(),hx_fh2_f2()) +         F*dT_conv
 dhx_fh2_t1 = dT_convective([hx_fh2_f1(),hx_fh2_f2(),hx_fh2_h1(),hx_fh2_h2()],hx_fh2_t1(),[h/mcp_t_hx for h in [hA_ft_hx,hA_ft_hx,hA_ht_hx,hA_ht_hx]])
 
 # Helium for FUEL-HELIUM HX2
-dhx_fh2_h1 = dT_bulkFlow(W_h_fh,m_h_hxfh,hx_hwf1_h2(),hx_fh2_h1()) + F*dT_convective([hx_fh2_t1()],hx_fh2_h1(),[hA_ht_hx/mcp_h_hxfh])
-dhx_fh2_h2 = dT_bulkFlow(W_h_fh,m_h_hxfh,hx_fh2_h1(),hx_fh2_h2()) +  F*dT_convective([hx_fh2_t1()],hx_fh2_h2(),[hA_ht_hx/mcp_h_hxfh])
+dhx_fh2_h1 = dT_bulkFlow(W_h_fh,m_h_hxfh/2,hx_hwf1_h2(),hx_fh2_h1()) + F*dT_convective([hx_fh2_t1()],hx_fh2_h1(),[hA_ht_hx/mcp_h_hxfh])
+dhx_fh2_h2 = dT_bulkFlow(W_h_fh,m_h_hxfh/2,hx_fh2_h1(),hx_fh2_h2()) +  F*dT_convective([hx_fh2_t1()],hx_fh2_h2(),[hA_ht_hx/mcp_h_hxfh])
 
-
+# %%
 # COOLANT-HELIUM HX1
 # Fuel Nodes
 dhx_ch1_c1 = dT_bulkFlow(W_c, m_c_hx, c_c2(t-tau_c_hx_f), hx_ch1_c1()) + F*dT_convective([hx_ch1_t1()], hx_ch1_c1(), [hA_ct_hx/mcp_c_hxch])
@@ -180,8 +208,7 @@ dhx_ch2_t1 = dT_convective([hx_ch2_c1(),hx_ch2_c2(),hx_ch2_h1(),hx_ch2_h2()],hx_
 # Helium
 dhx_ch2_h1 = dT_bulkFlow(W_h_ch, m_h_hxch/2, hx_hwc2_h2(t-tau_h), hx_ch2_h1()) + F*dT_convective([hx_ch2_t1()], hx_ch2_h1(), [hA_th_hxch/mcp_h_hxch])
 dhx_ch2_h2 = dT_bulkFlow(W_h_ch, m_h_hxch/2, hx_ch2_h1(), hx_ch2_h2()) +         F*dT_convective([hx_ch2_t1()], hx_ch2_h2(), [hA_th_hxch/mcp_h_hxch])
-
-
+# %%
 # HELIUM-WATER HX1 (FUEL LOOP)
 # Helium
 dhx_hwf1_h1 = dT_bulkFlow(W_h_fh, m_h_hxhw/2, hx_fh1_h2(), hx_hwf1_h1()) +  F*dT_convective([hx_hwf1_t1()], hx_hwf1_h1(), [hA_ht_hxhw/mcp_h_hxhw])
@@ -299,6 +326,11 @@ for t_x in T:
     sol_jit.append(DDE.integrate(t_x))
 
 
-plt.plot(T,[s[46] for s in sol_jit])
-plt.savefig('test_run.png')
-print(sol_jit[-1][46])
+#plt.plot(T,[s[46] for s in sol_jit])
+#plt.savefig('test_run.png')
+#print(sol_jit[-1][46])
+
+
+c_f1.set_dTdt_BulkFlow(source = (hx_fh1_f2(t-tau_hx_c_f)+hx_fh2_f2(t-tau_hx_c_f))/2) 
+c_f1.set_dTdt_Internal(n = n(), P = P, mcp = mcp_f_c, k = k_f1)
+c_f1.set_dTdt_convective(source = [c_t1()], hA_mcp = [hA_ft_c/mcp_f_c])
