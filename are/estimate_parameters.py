@@ -1,6 +1,6 @@
 # %%
 from jitcdde import jitcdde, y, t, jitcdde_input, input
-from parameters_expanded import *
+from parameters import *
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd

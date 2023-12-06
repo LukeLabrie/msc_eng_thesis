@@ -21,18 +21,17 @@ class Node:
         self.y0 = 0.0
         self.y = None           # temperature (K), to be assigned by System class
     
-    def set_dTdt_BulkFlow(self, source: y, dumped: bool = False):
+    def set_dTdt_BulkFlow(self, source):
         '''
         Energy from bulk flow
-        source: source node (state variable y(i))
+        source: source node (state variable y(i) or constant)
         dumped: if 'from node' is a constant (indicates dumping instead of 
                 recirculation), this needs to be set to true
         '''
-        if (dumped):
-                self.BulkFlow = (source.y)*self.W/self.m
-        else: 
+        if isinstance(source, float):
+                self.BulkFlow = (source-self.y)*self.W/self.m
+        elif isinstance(source, y):
                 self.BulkFlow = (source.y-self.y)*self.W/self.m
-        return None
 
     def set_dTdt_Internal(self, source: y, k: float):
         '''
@@ -43,7 +42,6 @@ class Node:
         k: fraction of power generation in node 
         '''
         self.internal = k*source.y
-        return None
     
 
     def set_dTdt_convective(self, source: list, hA_mcp: list):
@@ -55,13 +53,12 @@ class Node:
         '''
         for i in range(len(source)):
                 self.convective += hA_mcp[i]*(source[i].y-self.y)
-        return None
     
     def dTdt(self):
-          T1 = self.BulkFlow
-          T2 = self.internal
-          T3 = self.convective
-          sum = T1 + T2 + T3
+          dT1 = self.BulkFlow
+          dT2 = self.internal
+          dT3 = self.convective
+          sum = dT1 + dT2 + dT3
           return sum
 
 

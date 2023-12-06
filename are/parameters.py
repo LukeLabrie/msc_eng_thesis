@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import math
 from collections import namedtuple
 
@@ -12,7 +11,7 @@ tf = 1000.00
 T = np.arange(0.0,tf,0.01)
 
 # reactivity insertion
-inserted = 4e-3
+inserted = 0.0
 insert_duration = 0.4/0.011 # ORNL-1845
 t_ins = 300.00
 
@@ -324,22 +323,22 @@ T0_hhwf_t1 = ((T0_hhwf_h1+T0_hhwf_w1)/2)
 
 V_h_hxhw_US = (pi*((0.625/2)-0.049)**2)*825*12 # in^3 ORNL-1535 p.47
 V_h_hxhw = V_h_hxhw_US/61020 # m^3 
-m_h_hxhw = V_h_hxhw*rho_h
+m_h_hxhwf = V_h_hxhw*rho_h
 
 V_t_hxhw_US = ((pi*((0.625/2))**2)*825*12)-V_h_hxhw_US
 V_t_hxhw = V_t_hxhw_US/61020 # m^3
-m_t_hxhw = rho_inconel*V_t_hxhw
-mcp_t_hxhw = m_t_hxhw*scp_t
+m_t_hxhwf = rho_inconel*V_t_hxhw
+mcp_t_hxhw = m_t_hxhwf*scp_t
 
 # water mass flow rate
 W_hhwf_w = 998*((103*2)/15850)                 # water flow (kg/s) ORNL-1845 p.121
 W_hhwf_w_US = W_hhwf_w*2.205                 # (lb/s)
 V_w_US = (27*27.5*27)-V_t_hx_US-V_h_hxhw_US  # in^3
 V_w = V_w_US/61020                           # in^3 -> m^3
-m_w = V_w*998 
+m_w_hxhwf = V_w*998 
 scp_w = 4.181e-3
-mcp_w = m_w*scp_w
-mcp_h_hxhw = m_h_hxhw*scp_h
+mcp_w = m_w_hxhwf*scp_w
+mcp_h_hxhw = m_h_hxhwf*scp_h
 
 # helium<->tube
 hxhw_h_p1 = Point(0.5,1.40)

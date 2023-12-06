@@ -1,3 +1,5 @@
+# %%
+
 from variables_minimal import *
 from jitcdde import jitcdde, t
 import numpy as np
@@ -35,6 +37,9 @@ DDE = jitcdde([dc_f1,dc_f2,dc_t1,dc_c1,dc_c2,dc_m,dn,dC1,drho])
 
 # set initial conditions
 DDE.constant_past([T0_c_f1,T0_c_f2,T0_c_t1,T0_c_c1,T0_c_c2,T0_c_m+50,n_frac0,C0[0],0.0])
+
+DDE.get_state()
+# %%
 
 T = np.arange(0.0,250,0.01)
 sol_jit = []
