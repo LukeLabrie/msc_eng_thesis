@@ -239,18 +239,41 @@ def estimate_all():
     tw_hxhwc = 0.0893816147929607
     tw_hxhwc_lims = (tw_hxhwc/10,10*tw_hxhwc)
 
+    Lam_guess = Lam
+    Lam_lims = (Lam/3,3*Lam)
+
+    l1_guess = lam[0]
+    l1_lims = (l1_guess/5,5*l1_guess)
+
+    l2_guess = lam[1]
+    l2_lims = (l2_guess/5,5*l2_guess)
+
+    l3_guess = lam[2]
+    l3_lims = (l3_guess/5,5*l3_guess)
+
+    l4_guess = lam[3]
+    l4_lims = (l4_guess/5,5*l4_guess)
+
+    l5_guess = lam[4]
+    l5_lims = (l5_guess/5,5*l5_guess)
+
+    l6_guess = lam[5]
+    l6_lims = (l6_guess/5,5*l6_guess)
 
     initial_guess = [a_f0,a_b0,a_c0,ins0,b0,initial_hx_c_f,initial_hx_c_c,
                      initial_c_hx_f,initial_h_loop_f,initial_h_btw_f,
                      initial_c_hx_c,initial_h_loop_c,initial_h_btw_c,ft_c,
                      tc_c,mc_c,ft_hx,ht_hx,ct_hx,th_hxch,ht_hxhw,tw_hxhw,
-                     ht_hxhwc,tw_hxhwc]
+                     ht_hxhwc,tw_hxhwc,Lam_guess,l1_guess,l2_guess,l3_guess,
+                     l4_guess,l5_guess,l6_guess]
     
     bounds = [a_f_bounds,a_b_bounds,a_c_bounds,ins_bounds,b_bounds,
               hx_c_f_bounds,hx_c_c_bounds,c_hx_f_bounds,h_loop_f_bounds,
               h_btw_f_bounds,c_hx_c_bounds,h_loop_c_bounds,h_btw_c_bounds, 
               ft_c_lims,tc_c_lims, mc_c_lims,ft_hx_lims,ht_hx_lims,ct_hx_lims,
-              th_hxch_lims,ht_hxhw_lims,tw_hxhw_lims,ht_hxhwc_lims,tw_hxhwc_lims]
+              th_hxch_lims,ht_hxhw_lims,tw_hxhw_lims,ht_hxhwc_lims,tw_hxhwc_lims,
+              Lam_lims,l1_lims,l2_lims,l3_lims,l4_lims,l5_lims,l6_lims]
+
 
     # minimize
     result = minimize(sumSq_all, 
@@ -266,3 +289,16 @@ result = estimate_all()
 
 # %%
 print(result.x)
+# Assuming 'result.x' contains the value you want to write to the file
+value_to_write = result.x
+
+# Specify the file path where you want to save the value
+file_path = "output.txt"
+
+# Open the file in write mode and write the value to it
+with open(file_path, "w") as file:
+    file.write(str(value_to_write))
+
+# The value has been written to the file
+print(f"Value has been written to {file_path}")
+
