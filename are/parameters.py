@@ -7,13 +7,15 @@ from collections import namedtuple
 ###############################################################################
 
 # domain
+t0 = 0.0
 tf = 1000.00
-T = np.arange(0.0,tf,0.01)
+T = np.arange(t0,tf,0.01)
 
 # reactivity insertion
-inserted = 0.0
+inserted = 4e-3
 insert_duration = 0.4/0.011 # ORNL-1845
 t_ins = 300.00
+t_wd = t_ins + (60*4)
 
 # debugging constants
 arbitrary_removal = 0 # test effect of increased remvoal from system 

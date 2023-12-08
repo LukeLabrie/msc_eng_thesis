@@ -8,14 +8,11 @@ from scipy.interpolate import CubicSpline
 
 # %%
 # read experimental data
-df_reversed = pd.read_csv("./data/dollar_insert.csv",header=None)
+df_reversed = pd.read_csv("./data/insertion.csv",header=None)
 df = df_reversed.iloc[::-1]
 df = df.reset_index(drop=True)
 
 # get indicies for comparison
-t0 = 300.00
-tf = 1000.00
-T = np.arange(0.0,tf,0.01)
 t_before_data = (1110-df[0][0])*60
 duration_data = (df.iloc[-1][0]-df[0][0])*60
 t_end_data = df.iloc[-1][0]
@@ -62,10 +59,11 @@ def sumSq_all(params):
         sol_jit = relax_all(params) # Implement this function to run your model
         
         # calculate error
-        simulation_output = [s[46]*P for s in sol_jit][i_insert[0]:(i_insert[-1]+1)]
+        simulation_output = [s[6]*P for s in sol_jit][i_insert[0]:(i_insert[-1]+1)]
         error = sum((simulation_output - interpolated_values)**2)  # Sum of squared errors
         return error
     except:
+        print("failed")
         return float('inf')
     
 
@@ -154,12 +152,17 @@ def estimate_ht():
     bounds = [ft_c_lims,tc_c_lims,mc_c_lims,ft_hx_lims,ht_hx_lims,ct_hx_lims,
               th_hxch_lims,ht_hxhw_lims,tw_hxhw_lims,ht_hxhwc_lims,tw_hxhwc_lims]
 
-    # minimize
-    result = minimize(sumSq_ht, 
-                      initial_guess, 
-                      bounds=bounds)
-                      #method='TNC',
-                      #options={'eps': 1e-24})
+    def print_guess(xk):
+        print(f"Current Parameters: {xk}")
+
+    # Example usage in minimize
+    result = minimize(
+        sumSq_all, 
+        initial_guess, 
+        bounds=bounds,
+        callback=print_guess
+    )
+
 
     return result
 
@@ -276,11 +279,16 @@ def estimate_all():
 
 
     # minimize
+    def print_guess(xk):
+        print(f"Current Parameters: {xk}")
+
+    # Example usage in minimize
     result = minimize(sumSq_all, 
-                      initial_guess, 
-                      bounds=bounds)
-                      #method='TNC',
-                      #options={'eps': 1e-24})
+                      initial_guess,
+                      bounds=bounds,
+                      callback=print_guess
+                      )
+
 
     return result
 
@@ -293,7 +301,7 @@ print(result.x)
 value_to_write = result.x
 
 # Specify the file path where you want to save the value
-file_path = "output.txt"
+file_path = "output_with_reinsertion.txt"
 
 # Open the file in write mode and write the value to it
 with open(file_path, "w") as file:
