@@ -120,25 +120,38 @@ def relax_feedback_insertion_beta(params):
     T_hhwc2_w1 = dT_bulkFlow(W_hhwc_w, m_w_hxhwc/2, T0_hhwf_w1-hx_hwc2_w1(), hx_hwc2_w1(), dumped=True) + F*dT_convective([hx_hwc2_t1()], hx_hwc2_w1(), [hA_tw_hxhwc/mcp_w_hxhwc])
     T_hhwc2_w2 = dT_bulkFlow(W_hhwc_w, m_w_hxhwc/2, hx_hwc2_w1(), hx_hwc2_w2()) + F*dT_convective([hx_hwc2_t1()], hx_hwc2_w2(), [hA_tw_hxhwc/mcp_w_hxhwc])
 
-    # reactivity insertion
+    # # reactivity insertion
+    # def rho_insert(t):
+    #     if (t<t_ins):
+    #         return 0.0
+    #     elif (t<(t_ins+insert_duration)):
+    #         return ((t-t_ins))*(inserted/insert_duration) # linear
+    #     elif (t < t_wd):
+    #         return inserted
+    #     elif (t < t_wd+insert_duration):
+    #         return -((t-t_wd))*(inserted/insert_duration) # linear
+    #     else:
+    #         return 0.0
+
+    # rho_spline = CubicHermiteSpline(n=1)
+    # rho_spline.from_function(rho_insert, times_of_interest = T)
+    # rho_ext = input(0)
+
     def rho_insert(t):
+        insert_duration = 0.4/0.011
         if (t<t_ins):
             return 0.0
         elif (t<(t_ins+insert_duration)):
-            return ((t-t_ins))*(inserted/insert_duration) # linear
-        elif (t < t_wd):
-            return inserted
-        elif (t < t_wd+insert_duration):
-            return -((t-t_wd))*(inserted/insert_duration) # linear
+            return ((t-t_ins))*(inserted/insert_duration)
         else:
-            return 0.0
+            return inserted
 
     rho_spline = CubicHermiteSpline(n=1)
     rho_spline.from_function(rho_insert, times_of_interest = T)
     rho_ext = input(0)
 
     dn = ((rho()+rho_ext)-beta_t)*n()/Lam+lam[0]*C1()+lam[1]*C2()+lam[2]*C3()+lam[3]*C4()+lam[4]*C5()+lam[5]*C6()           # n (no source insertion): n()
-
+    
     # dC_i/dt (precursor concentrations)
     dC1 = n()*beta_t*(beta/beta_t)[0]/Lam - lam[0]*C1() - C1()/tau_c + C1(t-tau_l)*np.exp(-lam[0]*tau_l)/tau_c                       # C1: y(27)
     dC2 = n()*beta_t*(beta/beta_t)[1]/Lam - lam[1]*C2() - C2()/tau_c + C2(t-tau_l)*np.exp(-lam[1]*tau_l)/tau_c                       # C2: y(28)
@@ -314,7 +327,6 @@ def relax_delays(params):
 
     rho_spline = CubicHermiteSpline(n=1)
     rho_spline.from_function(rho_insert, times_of_interest = T)
-
     rho_ext = input(0)
 
     dn = ((rho()+rho_ext)-beta_t)*n()/Lam+lam[0]*C1()+lam[1]*C2()+lam[2]*C3()+lam[3]*C4()+lam[4]*C5()+lam[5]*C6()           # n (no source insertion): n()

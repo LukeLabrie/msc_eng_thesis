@@ -8,7 +8,7 @@ from scipy.interpolate import CubicSpline
 
 # %%
 # read experimental data
-df_reversed = pd.read_csv("./data/insertion.csv",header=None)
+df_reversed = pd.read_csv("./data/dollar_insert.csv",header=None)
 df = df_reversed.iloc[::-1]
 df = df.reset_index(drop=True)
 
@@ -67,6 +67,17 @@ def sumSq_all(params):
         return float('inf')
     
 
+def sumSq_initial(params):
+    try:
+        # run
+        sol_jit = relax_feedback_insertion_beta(params)
+        
+        # calculate error
+        simulation_output = [s[6]*P for s in sol_jit][i_insert[0]:(i_insert[-1]+1)]
+        error = sum((simulation_output - interpolated_values)**2)  # Sum of squared errors
+        return error
+    except:
+        return float('inf')
 # %%
 
 from scipy.optimize import minimize
@@ -171,7 +182,7 @@ def estimate_all():
 
     # set bounds
     a_f0 = -9.8e-5
-    a_f_bounds = (-20e-5, -2e-5)
+    a_f_bounds = (-20e-5, 20e-5)
 
     a_b0 = -1.1e-5
     a_b_bounds = (-5e-5, 5e-5)
@@ -292,86 +303,33 @@ def estimate_all():
 
     return result
 
+def estimate_feedback():
+    # set bounds
+    a_f0 = -9.8e-5
+    a_f_bounds = (-20e-5, 20e-5)
 
-# set bounds
-# a_f0 = -9.8e-5
-# a_b0 = -1.1e-5
-# a_c0 = -5.88e-5
-# ins0 = 4e-3
-# b0 = beta_t
-# initial_hx_c_f = 20.0
-# initial_hx_c_c = 20.0
-# initial_c_hx_f = 20.0
-# initial_h_loop_f = 1.0
-# initial_h_btw_f = 0.0
-# initial_c_hx_c = 20.0
-# initial_h_loop_c = 1.0
-# initial_h_btw_c = 0.0
-# ft_c = 0.025249076460017884
-# tc_c = 0.0146062610110109899
-# mc_c = 0.00092151047071557199
-# ft_hx = 0.006092568792077965
-# ft_hx_lims = (ft_hx/10,10*ft_hx)
+    a_b0 = -1.1e-5
+    a_b_bounds = (-5e-5, 5e-5)
 
-# ht_hx = 0.0014320505785117184
-# ht_hx_lims = (ht_hx/10,10*ht_hx)
+    a_c0 = -5.88e-5
+    a_c_bounds = (-20e-5, 20e-5)
 
-# ct_hx = 0.0101010207925026710110
-# ct_hx_lims = (ct_hx/10,10*ct_hx)
+    ins0 = 4e-3
+    ins_bounds = (1e-3, 20e-3)
 
-# th_hxch = 0.0004489850066827337
-# th_hxch_lims = (th_hxch/10,10*th_hxch)
+    b0 = beta_t
+    b_bounds = (1e-3,10e-3)
 
-# ht_hxhw = 0.004725554058974901
-# ht_hxhw_lims = (ht_hxhw/10,10*ht_hxhw)
+    initial_guess = [a_f0,a_b0,a_c0,ins0,b0]
+    bounds = [a_f_bounds,a_b_bounds,a_c_bounds,ins_bounds,b_bounds]
 
-# tw_hxhw = 0.3439054124906395
-# tw_hxhw_lims = (tw_hxhw/10,10*tw_hxhw)
+    # minimize
+    result = minimize(sumSq_initial, initial_guess, bounds=bounds)
 
-# ht_hxhwc = 0.0004752963985070788
-# ht_hxhwc_lims = (ht_hxhwc/10,10*ht_hxhwc)
-
-# tw_hxhwc = 0.0893816147929607
-# tw_hxhwc_lims = (tw_hxhwc/10,10*tw_hxhwc)
-
-# Lam_guess = Lam
-# Lam_lims = (Lam/3,3*Lam)
-
-# l1_guess = lam[0]
-# l1_lims = (l1_guess/5,5*l1_guess)
-
-# l2_guess = lam[1]
-# l2_lims = (l2_guess/5,5*l2_guess)
-
-# l3_guess = lam[2]
-# l3_lims = (l3_guess/5,5*l3_guess)
-
-# l4_guess = lam[3]
-# l4_lims = (l4_guess/5,5*l4_guess)
-
-# l5_guess = lam[4]
-# l5_lims = (l5_guess/5,5*l5_guess)
-
-# l6_guess = lam[5]
-# l6_lims = (l6_guess/5,5*l6_guess)
-
-# initial_guess = [a_f0,a_b0,a_c0,ins0,b0,initial_hx_c_f,initial_hx_c_c,
-#                     initial_c_hx_f,initial_h_loop_f,initial_h_btw_f,
-#                     initial_c_hx_c,initial_h_loop_c,initial_h_btw_c,ft_c,
-#                     tc_c,mc_c,ft_hx,ht_hx,ct_hx,th_hxch,ht_hxhw,tw_hxhw,
-#                     ht_hxhwc,tw_hxhwc,Lam_guess,l1_guess,l2_guess,l3_guess,
-#                     l4_guess,l5_guess,l6_guess]
-
-# res = relax_all(initial_guess)
-# simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
-# plt.plot(T_insert,simulation_output)
-# plt.plot(T_insert,interpolated_values)
-# plt.show()
-
-
+    return result
 
 # %%
-result = estimate_all()
+result = estimate_feedback()
 
 # # %%
 print(result.x)
@@ -379,7 +337,7 @@ print(result.x)
 value_to_write = result.x
 
 # # Specify the file path where you want to save the value
-file_path = "output_with_reinsertion.txt"
+file_path = "output_with_reinsertion_just_feedback.txt"
 
 # # Open the file in write mode and write the value to it
 with open(file_path, "w") as file:
@@ -388,3 +346,16 @@ with open(file_path, "w") as file:
 # # The value has been written to the file
 print(f"Value has been written to {file_path}")
 
+
+
+# a_f0 = -9.8e-5
+# a_b0 = 1.1e-5
+# a_c0 = -5.88e-5
+# ins0 = 4e-3
+# b0 = beta_t
+# initial_guess = [a_f0,a_b0,a_c0,ins0,b0]
+# res = relax_feedback_insertion_beta(initial_guess)
+# simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
+# plt.plot(T_insert,simulation_output)
+# plt.plot(T_insert,interpolated_values)
+# plt.show()
