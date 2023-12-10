@@ -8,7 +8,7 @@ from scipy.interpolate import CubicSpline
 
 # %%
 # read experimental data
-df_reversed = pd.read_csv("./data/dollar_insert.csv",header=None)
+df_reversed = pd.read_csv("./data/insertion.csv",header=None)
 df = df_reversed.iloc[::-1]
 df = df.reset_index(drop=True)
 
@@ -324,38 +324,41 @@ def estimate_feedback():
     bounds = [a_f_bounds,a_b_bounds,a_c_bounds,ins_bounds,b_bounds]
 
     # minimize
-    result = minimize(sumSq_initial, initial_guess, bounds=bounds)
+    result = minimize(sumSq_initial, initial_guess, bounds=bounds,method='Nelder-Mead')
 
     return result
 
 # %%
-result = estimate_feedback()
+# result = estimate_feedback()
 
-# # %%
-print(result.x)
-# # Assuming 'result.x' contains the value you want to write to the file
-value_to_write = result.x
+# # # # %%
+# print(result.x)
+# # # # Assuming 'result.x' contains the value you want to write to the file
+# value_to_write = result.x
 
-# # Specify the file path where you want to save the value
-file_path = "output_with_reinsertion_just_feedback.txt"
+# # # # Specify the file path where you want to save the value
+# file_path = "output_feedback_NM.txt"
 
-# # Open the file in write mode and write the value to it
-with open(file_path, "w") as file:
-    file.write(str(value_to_write))
+# # # # Open the file in write mode and write the value to it
+# with open(file_path, "w") as file:
+#     file.write(str(value_to_write))
 
-# # The value has been written to the file
-print(f"Value has been written to {file_path}")
+# # # # The value has been written to the file
+# print(f"Value has been written to {file_path}")
 
-
-
+#from_file = [-1.99496857e-04, -4.99905872e-05,  1.74383022e-04,  6.82744637e-03, 3.52626522e-03] # no reinsertion
+#from_file = [-2.36341143e-05, -5.00000000e-05,  2.01131763e-05,  1.00000000e-03, 2.97544233e-03] # reinsertion, forgot rho function
+#from_file = [-4.12900591e-05,  4.33967181e-05,  1.85146114e-05,  1.76526592e-03, 2.22301472e-03]
+from_file = [-2.75109719e-05,  1.35671394e-05,  1.92674101e-05,  1.01544816e-03, 3.38047855e-03] #NM
 # a_f0 = -9.8e-5
 # a_b0 = 1.1e-5
 # a_c0 = -5.88e-5
 # ins0 = 4e-3
 # b0 = beta_t
-# initial_guess = [a_f0,a_b0,a_c0,ins0,b0]
-# res = relax_feedback_insertion_beta(initial_guess)
-# simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
-# plt.plot(T_insert,simulation_output)
-# plt.plot(T_insert,interpolated_values)
-# plt.show()
+# #initial_guess = [a_f0,a_b0,a_c0,ins0,b0]
+res = relax_feedback_insertion_beta(from_file)
+simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
+plt.plot(T_insert,simulation_output)
+plt.plot(T_insert,interpolated_values)
+plt.savefig("test_full.png")
+# # plt.show()

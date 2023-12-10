@@ -166,7 +166,6 @@ def estimate_ht():
 
     return result
 
-
 def estimate_all():
 
     # set bounds
@@ -278,17 +277,18 @@ def estimate_all():
               Lam_lims,l1_lims,l2_lims,l3_lims,l4_lims,l5_lims,l6_lims]
 
 
-    # minimize
-    def print_guess(xk):
-        print(f"Current Parameters: {xk}")
+    def write_guess(xk):
+        f = 'inputs_all.txt'
+        with open(f, 'a') as file:  # Open the file in append mode
+            file.write(f"Current Parameters: {xk}\n")  # Write the parameters and a newline character
 
     # Example usage in minimize
     result = minimize(sumSq_all, 
-                      initial_guess,
-                      bounds=bounds,
-                      callback=print_guess
-                      )
-
+                    initial_guess,
+                    bounds=bounds,
+                    callback=write_guess,
+                    method='Nelder-Mead'
+                  )
 
     return result
 
@@ -366,7 +366,8 @@ def estimate_all():
 # simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
 # plt.plot(T_insert,simulation_output)
 # plt.plot(T_insert,interpolated_values)
-# plt.show()
+# plt.savefig('test_all.png')
+# # plt.show()
 
 
 

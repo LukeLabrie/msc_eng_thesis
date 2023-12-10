@@ -121,34 +121,34 @@ def relax_feedback_insertion_beta(params):
     T_hhwc2_w2 = dT_bulkFlow(W_hhwc_w, m_w_hxhwc/2, hx_hwc2_w1(), hx_hwc2_w2()) + F*dT_convective([hx_hwc2_t1()], hx_hwc2_w2(), [hA_tw_hxhwc/mcp_w_hxhwc])
 
     # # reactivity insertion
-    # def rho_insert(t):
-    #     if (t<t_ins):
-    #         return 0.0
-    #     elif (t<(t_ins+insert_duration)):
-    #         return ((t-t_ins))*(inserted/insert_duration) # linear
-    #     elif (t < t_wd):
-    #         return inserted
-    #     elif (t < t_wd+insert_duration):
-    #         return -((t-t_wd))*(inserted/insert_duration) # linear
-    #     else:
-    #         return 0.0
-
-    # rho_spline = CubicHermiteSpline(n=1)
-    # rho_spline.from_function(rho_insert, times_of_interest = T)
-    # rho_ext = input(0)
-
     def rho_insert(t):
-        insert_duration = 0.4/0.011
         if (t<t_ins):
             return 0.0
         elif (t<(t_ins+insert_duration)):
-            return ((t-t_ins))*(inserted/insert_duration)
-        else:
+            return ((t-t_ins))*(inserted/insert_duration) # linear
+        elif (t < t_wd):
             return inserted
+        elif (t < t_wd+insert_duration):
+            return -((t-t_wd))*(inserted/insert_duration) # linear
+        else:
+            return 0.0
 
     rho_spline = CubicHermiteSpline(n=1)
     rho_spline.from_function(rho_insert, times_of_interest = T)
     rho_ext = input(0)
+
+    # def rho_insert(t):
+    #     insert_duration = 0.4/0.011
+    #     if (t<t_ins):
+    #         return 0.0
+    #     elif (t<(t_ins+insert_duration)):
+    #         return ((t-t_ins))*(inserted/insert_duration)
+    #     else:
+    #         return inserted
+
+    # rho_spline = CubicHermiteSpline(n=1)
+    # rho_spline.from_function(rho_insert, times_of_interest = T)
+    # rho_ext = input(0)
 
     dn = ((rho()+rho_ext)-beta_t)*n()/Lam+lam[0]*C1()+lam[1]*C2()+lam[2]*C3()+lam[3]*C4()+lam[4]*C5()+lam[5]*C6()           # n (no source insertion): n()
     
