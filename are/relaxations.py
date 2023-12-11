@@ -129,7 +129,7 @@ def relax_feedback_insertion_beta(params):
         elif (t < t_wd):
             return inserted
         elif (t < t_wd+insert_duration):
-            return -((t-t_wd))*(inserted/insert_duration) # linear
+            return inserted-((t-t_wd))*(inserted/insert_duration) # linear
         else:
             return 0.0
 

@@ -277,95 +277,80 @@ def estimate_all():
               Lam_lims,l1_lims,l2_lims,l3_lims,l4_lims,l5_lims,l6_lims]
 
 
-    def write_guess(xk):
-        f = 'inputs_all.txt'
-        with open(f, 'a') as file:  # Open the file in append mode
-            file.write(f"Current Parameters: {xk}\n")  # Write the parameters and a newline character
+    # def write_guess(xk):
+    #     f = 'inputs_all.txt'
+    #     with open(f, 'a') as file:  # Open the file in append mode
+    #         file.write(f"Current Parameters: {xk}\n")  # Write the parameters and a newline character
 
     # Example usage in minimize
     result = minimize(sumSq_all, 
                     initial_guess,
                     bounds=bounds,
-                    callback=write_guess,
                     method='Nelder-Mead'
                   )
 
     return result
 
 
-# set bounds
-# a_f0 = -9.8e-5
-# a_b0 = -1.1e-5
-# a_c0 = -5.88e-5
-# ins0 = 4e-3
-# b0 = beta_t
-# initial_hx_c_f = 20.0
-# initial_hx_c_c = 20.0
-# initial_c_hx_f = 20.0
-# initial_h_loop_f = 1.0
-# initial_h_btw_f = 0.0
-# initial_c_hx_c = 20.0
-# initial_h_loop_c = 1.0
-# initial_h_btw_c = 0.0
-# ft_c = 0.025249076460017884
-# tc_c = 0.0146062610110109899
-# mc_c = 0.00092151047071557199
-# ft_hx = 0.006092568792077965
-# ft_hx_lims = (ft_hx/10,10*ft_hx)
-
-# ht_hx = 0.0014320505785117184
-# ht_hx_lims = (ht_hx/10,10*ht_hx)
-
-# ct_hx = 0.0101010207925026710110
-# ct_hx_lims = (ct_hx/10,10*ct_hx)
-
-# th_hxch = 0.0004489850066827337
-# th_hxch_lims = (th_hxch/10,10*th_hxch)
-
-# ht_hxhw = 0.004725554058974901
-# ht_hxhw_lims = (ht_hxhw/10,10*ht_hxhw)
-
-# tw_hxhw = 0.3439054124906395
-# tw_hxhw_lims = (tw_hxhw/10,10*tw_hxhw)
-
-# ht_hxhwc = 0.0004752963985070788
-# ht_hxhwc_lims = (ht_hxhwc/10,10*ht_hxhwc)
-
-# tw_hxhwc = 0.0893816147929607
-# tw_hxhwc_lims = (tw_hxhwc/10,10*tw_hxhwc)
-
-# Lam_guess = Lam
-# Lam_lims = (Lam/3,3*Lam)
-
-# l1_guess = lam[0]
-# l1_lims = (l1_guess/5,5*l1_guess)
-
-# l2_guess = lam[1]
-# l2_lims = (l2_guess/5,5*l2_guess)
-
-# l3_guess = lam[2]
-# l3_lims = (l3_guess/5,5*l3_guess)
-
-# l4_guess = lam[3]
-# l4_lims = (l4_guess/5,5*l4_guess)
-
-# l5_guess = lam[4]
-# l5_lims = (l5_guess/5,5*l5_guess)
-
-# l6_guess = lam[5]
-# l6_lims = (l6_guess/5,5*l6_guess)
+# # set bounds
+a_f0 = -1.764e-4
+a_b0 = 1.98e-5
+a_c0 = -1.058e-4
+ins0 = 6e-3
+b0 = beta_t
+initial_hx_c_f = 20.0
+initial_hx_c_c = 20.0
+initial_c_hx_f = 20.0
+initial_h_loop_f = 1.0
+initial_h_btw_f = 0.0
+initial_c_hx_c = 20.0
+initial_h_loop_c = 1.0
+initial_h_btw_c = 0.0
+ft_c = 0.025249076460017884
+tc_c = 0.0146062610110109899
+mc_c = 0.00092151047071557199
+ft_hx = 0.006092568792077965
+ht_hx = 0.0014320505785117184
+ct_hx = 0.0101010207925026710110
+th_hxch = 0.0004489850066827337
+ht_hxhw = 0.004725554058974901
+tw_hxhw = 0.3439054124906395
+ht_hxhwc = 0.0004752963985070788
+tw_hxhwc = 0.0893816147929607
+Lam_guess = 0.0024
+l1_guess = 0.0124
+l2_guess = 0.0305
+l3_guess = 0.111
+l4_guess = 0.301
+l5_guess = 1.14
+l6_guess = 3.014
 
 # initial_guess = [a_f0,a_b0,a_c0,ins0,b0,initial_hx_c_f,initial_hx_c_c,
-#                     initial_c_hx_f,initial_h_loop_f,initial_h_btw_f,
-#                     initial_c_hx_c,initial_h_loop_c,initial_h_btw_c,ft_c,
-#                     tc_c,mc_c,ft_hx,ht_hx,ct_hx,th_hxch,ht_hxhw,tw_hxhw,
-#                     ht_hxhwc,tw_hxhwc,Lam_guess,l1_guess,l2_guess,l3_guess,
-#                     l4_guess,l5_guess,l6_guess]
+#                      initial_c_hx_f,initial_h_loop_f,initial_h_btw_f,
+#                      initial_c_hx_c,initial_h_loop_c,initial_h_btw_c,ft_c,
+#                      tc_c,mc_c,ft_hx,ht_hx,ct_hx,th_hxch,ht_hxhw,tw_hxhw,
+#                      ht_hxhwc,tw_hxhwc,Lam_guess,l1_guess,l2_guess,l3_guess,
+#                      l4_guess,l5_guess,l6_guess]
 
-# res = relax_all(initial_guess)
+# for g in initial_guess:
+#     print(g)
+
+res_NM = [-2.86594554e-05,3.73492949e-06, 1.68118283e-05, 1.00264556e-03, 4.92662190e-03,
+          3.16511091e+01, 3.04783660e+01, 1.00124536e+01, 3.68708265e+00, 3.96825040e-03,  
+          1.00046299e+01, 1.00245969e+00, 2.84221812e-03, 1.58275108e-02, 3.46428214e-02,  
+          4.27613016e-04, 9.33258772e-03, 5.75974125e-03, 1.15639862e-03, 1.65871721e-03,
+          1.29043763e-02, 2.52389015e-01, 5.45311424e-04, 7.51769201e-02, 1.06779293e-04,  
+          9.16034759e-03, 4.96424479e-02, 2.44088251e-01, 1.26052199e-01, 1.81737248e+00,
+          6.05885569e-01]
+
+# res = relax_all(res_NM)
 # simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
-# plt.plot(T_insert,simulation_output)
-# plt.plot(T_insert,interpolated_values)
+# plt.plot(T_insert,simulation_output,label="JiTCDDE")
+# plt.plot(T_insert,interpolated_values,label="ORNL-1845")
+# plt.xlabel(r"$t$ (s)")
+# plt.ylabel("MW")
+# plt.title("Reactivity Insertions")
+# plt.legend()
 # plt.savefig('test_all.png')
 # # plt.show()
 
@@ -380,7 +365,7 @@ print(result.x)
 value_to_write = result.x
 
 # # Specify the file path where you want to save the value
-file_path = "output_with_reinsertion.txt"
+file_path = "output_estimate_all.txt"
 
 # # Open the file in write mode and write the value to it
 with open(file_path, "w") as file:
