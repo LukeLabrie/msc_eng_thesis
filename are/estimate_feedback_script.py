@@ -82,6 +82,7 @@ def sumSq_initial(params):
         return error
     except:
         return float('inf')
+    
 # %%
 
 from scipy.optimize import minimize
@@ -333,40 +334,41 @@ def estimate_feedback():
     return result
 
 # %%
-result = estimate_feedback()
+# result = estimate_feedback()
 
 # # # %%
-print(result.x)
-# # # Assuming 'result.x' contains the value you want to write to the file
-value_to_write = result.x
+# print(result.x)
+# # # # Assuming 'result.x' contains the value you want to write to the file
+# value_to_write = result.x
 
-# # # Specify the file path where you want to save the value
-file_path = "output_feedback_NM.txt"
+# # # # Specify the file path where you want to save the value
+# file_path = "output_feedback_NM.txt"
 
-# # # Open the file in write mode and write the value to it
-with open(file_path, "w") as file:
-    file.write(str(value_to_write))
+# # # # Open the file in write mode and write the value to it
+# with open(file_path, "w") as file:
+#     file.write(str(value_to_write))
 
-# # # The value has been written to the file
-print(f"Value has been written to {file_path}")
+# # # # The value has been written to the file
+# print(f"Value has been written to {file_path}")
 
 #from_file = [-1.99496857e-04, -4.99905872e-05,  1.74383022e-04,  6.82744637e-03, 3.52626522e-03] # no reinsertion
 #from_file = [-2.36341143e-05, -5.00000000e-05,  2.01131763e-05,  1.00000000e-03, 2.97544233e-03] # reinsertion, forgot rho function
 #from_file = [-4.12900591e-05,  4.33967181e-05,  1.85146114e-05,  1.76526592e-03, 2.22301472e-03]
 # from_file = [-2.75109719e-05,  1.35671394e-05,  1.92674101e-05,  1.01544816e-03, 3.38047855e-03] #NM
+from_file = [-2.00000000e-04, 4.99999886e-05, 1.47679144e-04, 7.31105685e-03, 1.00000000e-03]
 # a_f0 = -9.8e-5
 # a_b0 = 1.1e-5
 # a_c0 = -5.88e-5
 # ins0 = 4e-3
 # b0 = beta_t
 # initial_guess = [a_f,a_b,a_c,inserted,beta_t]
-# res = relax_feedback_insertion_beta(initial_guess)
-# simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
-# plt.plot(T_insert,simulation_output,label="JiTCDDE")
-# plt.plot(T_insert,interpolated_values,label="ORNL-1845")
-# plt.xlabel(r"$t$ (s)")
-# plt.ylabel("MW")
-# plt.title("Reactivity Insertions")
-# plt.legend()
-# plt.savefig("test_full_report.png")
-#plt.show()
+res = relax_feedback_insertion_beta(from_file)
+simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
+plt.plot(T_insert,simulation_output,label="JiTCDDE")
+plt.plot(T_insert,interpolated_values,label="ORNL-1845")
+plt.xlabel(r"$t$ (s)")
+plt.ylabel("MW")
+plt.title("Reactivity Insertions")
+plt.legend()
+plt.savefig("test_full_report.png")
+plt.show()

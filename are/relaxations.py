@@ -799,6 +799,8 @@ def relax_all(params):
     hA_tw_hxhw, hA_ht_hxhwc, hA_tw_hxhwc, Lam, lam0, lam1, lam2, lam3, \
     lam4, lam5 = params
     
+    tau_l = tau_c_hx_f + tau_hx_c_f
+    
     # CORE
     # fuel nodes
     dc_f1 = dT_bulkFlow(W_f, m_f_c/2, (hx_fh1_f2(t-tau_hx_c_f)+hx_fh2_f2(t-tau_hx_c_f))/2,c_f1()) + dT_internal(k_f1, P, mcp_f_c, n()) + F*dT_convective([c_t1()],c_f1(),[hA_ft_c/mcp_f_c]) - arbitrary_removal*c_f1()
