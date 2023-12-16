@@ -355,20 +355,21 @@ def estimate_feedback():
 #from_file = [-2.36341143e-05, -5.00000000e-05,  2.01131763e-05,  1.00000000e-03, 2.97544233e-03] # reinsertion, forgot rho function
 #from_file = [-4.12900591e-05,  4.33967181e-05,  1.85146114e-05,  1.76526592e-03, 2.22301472e-03]
 # from_file = [-2.75109719e-05,  1.35671394e-05,  1.92674101e-05,  1.01544816e-03, 3.38047855e-03] #NM
-from_file = [-2.00000000e-04, 4.99999886e-05, 1.47679144e-04, 7.31105685e-03, 1.00000000e-03]
-# a_f0 = -9.8e-5
-# a_b0 = 1.1e-5
-# a_c0 = -5.88e-5
-# ins0 = 4e-3
+# from_file = [-2.00000000e-04, 4.99999886e-05, 1.47679144e-04, 7.31105685e-03, 1.00000000e-03]
+# a_f0 = a_f
+# a_b0 = a_b
+# a_c0 = a_c
+# ins0 = 0.0
 # b0 = beta_t
-# initial_guess = [a_f,a_b,a_c,inserted,beta_t]
-res = relax_feedback_insertion_beta(from_file)
+initial_guess = [a_f,a_b,a_c,0.0,beta_t]
+res = relax_feedback_insertion_beta(initial_guess)
 simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
-plt.plot(T_insert,simulation_output,label="JiTCDDE")
-plt.plot(T_insert,interpolated_values,label="ORNL-1845")
-plt.xlabel(r"$t$ (s)")
-plt.ylabel("MW")
-plt.title("Reactivity Insertions")
-plt.legend()
-plt.savefig("test_full_report.png")
-plt.show()
+print(simulation_output[-1])
+# plt.plot(T_insert,simulation_output,label="JiTCDDE")
+# plt.plot(T_insert,interpolated_values,label="ORNL-1845")
+# plt.xlabel(r"$t$ (s)")
+# plt.ylabel("MW")
+# plt.title("Reactivity Insertions")
+# plt.legend()
+# plt.savefig("test_full_report.png")
+# plt.show()

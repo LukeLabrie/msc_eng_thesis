@@ -160,11 +160,18 @@ def hA(W,points):
 ###############################################################################
 
 # wights
-k_f1 = 0.475       # fractional power generation (fuel)
-k_f2 = 0.475        # fractional power generation (fuel)
-k_m = 1-(k_f1+k_f2) # fractional power generation (beryllium)
-k_1 = 0.5
-k_2 = 1-k_1
+# k_f1 = 0.475       # fractional power generation (fuel)
+# k_f2 = 0.475        # fractional power generation (fuel)
+# k_m = 1-(k_f1+k_f2) # fractional power generation (beryllium)
+# k_1 = 0.5
+# k_2 = 1-k_1
+
+k_f1 = 0.475/2       # fractional power generation (fuel)
+k_f2 = 0.475/2        # fractional power generation (fuel)
+k_f3 = 0.475/2        # fractional power generation (fuel)
+k_f4 = 0.475/2        # fractional power generation (fuel)
+k_m = 1-(k_f1+k_f2+k_f3+k_f4) # fractional power generation (beryllium)
+k_1 = 0.25
 
 # thermal feedback (1/Kelvin, temperature provided in Kelvin) ORNL-1845 pg. 115
 a_f = (-9.8e-5)*9/5
@@ -196,20 +203,20 @@ A_mc = 961677.131/10000                                  # CAD model (cm^2)->(m^
 V_m = 926899.473/1e6                                     # CAD model (cm^2)->(m^3)
 
 # density 
-# rho_c = 1000*0.78  # coolant density (kg/m^3) 
+rho_c = 1000*0.78  # coolant density (kg/m^3) 
 
 # density data from https://apps.dtic.mil/sti/tr/pdf/AD0622191.pdf
 temperature = np.array([1576.8, 1886.2, 2093.5, 2268.9, 2491.2])
 density = np.array([46.738, 43.926, 42.224, 40.641, 38.933])
 
 # line of best fit 
-coefficients = np.polyfit(temperature, density, 1)
-slope, intercept = coefficients
-slope = slope*(9/5)*(0.453)*(1/0.028) # (lb/ft^3)/(deg F) -> (kg/m^3)/(deg C)
-intercept = F_to_K(intercept)
-def coolant_density(T_c):
-    return T_c*slope + intercept
-rho_c = coolant_density((T0_c_c1+T0_c_c2)/2)
+# coefficients = np.polyfit(temperature, density, 1)
+# slope, intercept = coefficients
+# slope = slope*(9/5)*(0.453)*(1/0.028) # (lb/ft^3)/(deg F) -> (kg/m^3)/(deg C)
+# intercept = F_to_K(intercept)
+# def coolant_density(T_c):
+#     return T_c*slope + intercept
+# rho_c = coolant_density((T0_c_c1+T0_c_c2)/2)
 
 # mass
 m_f_c = fuel_density(T_fuel_avg)*V_fuel
