@@ -35,7 +35,7 @@ rho_m = 2.75*1000               # BeO density (kg/m^3) ORNL-1845 p.
 # specific heat capacities 
 #scp_f = 1.9665e-3       # specific heat capacity of fuel salt (BTU/lb*defF) -> (MJ/kg-C) ORNL-TM-0728 p.8
 scp_t = 0.101*4.1869e-3 # specific heat capacity of inconel 600 (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
-scp_f = (1)*(0.26*4.1869e-3)  # specific heat capacity of fuel salt ORNL-1845 p.113 (BTU/lb*defF) -> (MJ/kg-C)
+scp_f = (0.26*4.1869e-3)  # specific heat capacity of fuel salt ORNL-1845 p.113 (BTU/lb*defF) -> (MJ/kg-C)
 scp_c = 0.3*4.1869e-3   # specific heat capacity of cooolant (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
 scp_h = 1.248*4.1869e-3 # specigic heat capacity of helium (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
 scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
@@ -199,14 +199,12 @@ V_m = 926899.473/1e6                                     # CAD model (cm^2)->(m^
 # rho_c = 1000*0.78  # coolant density (kg/m^3) 
 
 # density data from https://apps.dtic.mil/sti/tr/pdf/AD0622191.pdf
-temperature = np.array([1576.8, 1886.2, 2093.5, 2268.9, 2491.2])
-density = np.array([46.738, 43.926, 42.224, 40.641, 38.933])
+temperature = np.array([F_to_K(t) for t in [1576.8, 1886.2, 2093.5, 2268.9, 2491.2]])
+density = np.array([16.0186*r for r in [46.738, 43.926, 42.224, 40.641, 38.933]]) # lb/ft^3 -> kg/m^3
 
 # line of best fit 
 coefficients = np.polyfit(temperature, density, 1)
 slope, intercept = coefficients
-slope = slope*(9/5)*(0.453)*(1/0.028) # (lb/ft^3)/(deg F) -> (kg/m^3)/(deg C)
-intercept = F_to_K(intercept)
 def coolant_density(T_c):
     return T_c*slope + intercept
 rho_c = coolant_density((T0_c_c1+T0_c_c2)/2)

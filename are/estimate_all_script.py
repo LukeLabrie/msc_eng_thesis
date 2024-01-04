@@ -367,35 +367,44 @@ def estimate_all():
 #                       2.44088251e-01, 1.26052199e-01, 1.81737248e+00, 
 #                       6.05885569e-01]
 
+res_NM = [-2.53424038e-05, -6.98691208e-06, 1.64184754e-05, 1.00088898e-03, 
+          3.07827575e-03, 1.00081118e+01, 1.40579043e+01, 3.05424471e+01, 
+          1.42354768e+00, 1.27739427e-03, 2.73652687e+01, 1.22650921e+00, 
+          9.45871224e-04, 1.64366594e-02, 1.63930505e-02, 1.41968922e-03, 
+          9.39051012e-03, 4.77733262e-03, 9.59244152e-03, 5.17781810e-04, 
+          5.11724562e-03, 6.72961054e-02, 9.42059568e-04, 5.98029211e-02, 
+          2.53032501e-04, 1.95941904e-02, 5.97179611e-02, 4.95318033e-02, 
+          1.03804048e-01, 2.28130796e-01, 1.81584469e+00]
 
-# res = relax_all(res_NM)
-# simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
-# plt.plot(T_insert,simulation_output,label="JiTCDDE")
-# plt.plot(T_insert,interpolated_values,label="ORNL-1845")
-# plt.xlabel(r"$t$ (s)")
-# plt.ylabel("MW")
-# plt.title("Reactivity Insertions")
-# plt.legend()
-# plt.savefig('test_all.png')
+
+res = relax_all(res_NM)
+simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
+plt.plot(T_insert,simulation_output,label="JiTCDDE")
+plt.plot(T_insert,interpolated_values,label="ORNL-1845")
+plt.xlabel(r"$t$ (s)")
+plt.ylabel("MW")
+plt.title("Reactivity Insertions")
+plt.legend()
+plt.savefig('test_all.png')
 # plt.show()
 
 
 
 # %%
-result = estimate_all()
+# result = estimate_all()
 
-# # %%
-print(result.x)
-# # Assuming 'result.x' contains the value you want to write to the file
-value_to_write = result.x
+# # # %%
+# print(result.x)
+# # # Assuming 'result.x' contains the value you want to write to the file
+# value_to_write = result.x
 
-# # Specify the file path where you want to save the value
-file_path = "output_estimate_all.txt"
+# # # Specify the file path where you want to save the value
+# file_path = "output_estimate_all.txt"
 
-# # Open the file in write mode and write the value to it
-with open(file_path, "w") as file:
-    file.write(str(value_to_write))
+# # # Open the file in write mode and write the value to it
+# with open(file_path, "w") as file:
+#     file.write(str(value_to_write))
 
-# # The value has been written to the file
-print(f"Value has been written to {file_path}")
+# # # The value has been written to the file
+# print(f"Value has been written to {file_path}")
 
