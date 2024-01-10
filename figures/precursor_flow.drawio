@@ -1,9 +1,55 @@
-<mxfile host="app.diagrams.net" modified="2024-01-10T10:49:12.851Z" agent="Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0" version="22.1.18" etag="RUnSXDc3YXIjwWobX3Ac" type="github">
+<mxfile host="app.diagrams.net" modified="2024-01-10T10:56:18.040Z" agent="Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0" etag="U4lSqnf1Bt1dBCxYT4dk" version="22.1.18" type="github">
   <diagram name="Page-1" id="P6eSRARk4GymKliJ5_BG">
-    <mxGraphModel>
+    <mxGraphModel dx="717" dy="374" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-1" value="Core" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="280" y="240" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-3" value="&lt;div&gt;Outflow&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="350" y="240" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-4" value="Inflow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="350" y="410" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-5" value="" style="endArrow=classic;html=1;rounded=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;curved=0;" edge="1" parent="1" source="MbGP_hijEMX5W_ysb2KC-3" target="MbGP_hijEMX5W_ysb2KC-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="420" as="sourcePoint" />
+            <mxPoint x="520" y="570" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="380" y="200" />
+              <mxPoint x="560" y="200" />
+              <mxPoint x="560" y="340" />
+              <mxPoint x="560" y="480" />
+              <mxPoint x="380" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-6" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="MbGP_hijEMX5W_ysb2KC-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="420" as="sourcePoint" />
+            <mxPoint x="380" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-7" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="560" y="260" as="sourcePoint" />
+            <mxPoint x="560" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-8" value="$$\frac{C_i(t)}{\tau_c}$$" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="320" y="200" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-9" value="&lt;div&gt;$$\frac{C_i(t-\tau_l)}{\tau_c}e^{-\lambda_i \tau_l}$$&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="290" y="450" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-10" value="Delay" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="500" y="320" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="MbGP_hijEMX5W_ysb2KC-11" value="$$\tau_l$$" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="550" y="320" width="60" height="30" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
