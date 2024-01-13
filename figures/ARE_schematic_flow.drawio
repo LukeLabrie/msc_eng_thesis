@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-01-13T11:50:52.721Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="zLyTGFE8J6SbraRHlAZp" version="22.1.17" type="github">
+<mxfile host="app.diagrams.net" modified="2024-01-13T20:49:11.050Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="uDOkwUJ79Zijaxx-MOH1" version="22.1.17" type="github">
   <diagram name="Page-1" id="4zfZgd4Ece237QIw_unE">
-    <mxGraphModel dx="1115" dy="619" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="946" dy="526" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -201,13 +201,13 @@
             <mxPoint x="700" y="500" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="D7OsfmTdGm04QHHALEOI-38" value="Fuel" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="D7OsfmTdGm04QHHALEOI-38" value="Fuel" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
           <mxGeometry x="590" y="425" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="D7OsfmTdGm04QHHALEOI-39" value="Coolant" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="D7OsfmTdGm04QHHALEOI-39" value="Coolant" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
           <mxGeometry x="590" y="455" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="D7OsfmTdGm04QHHALEOI-40" value="Helium" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="D7OsfmTdGm04QHHALEOI-40" value="Helium" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
           <mxGeometry x="590" y="485" width="60" height="30" as="geometry" />
         </mxCell>
       </root>
