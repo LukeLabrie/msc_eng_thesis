@@ -84,19 +84,28 @@ def sumSq_initial(params):
         return float('inf')
     
 def sumSq_add_nodes(params):
-    try:
+    # try:
         # run
-        sol_jit = relax_feedback_extra_nodes(params)
-        
-        # calculate error
-        simulation_output = [s[8]*P for s in sol_jit][i_insert[0]:(i_insert[-1]+1)]
-        error = sum((simulation_output - interpolated_values)**2)  # Sum of squared errors
-        return error
-    except:
-        return float('inf')
+    sol_jit = relax_feedback_extra_nodes(params)
+    
+    # calculate error
+    simulation_output = [s[6]*P for s in sol_jit][i_insert[0]:(i_insert[-1]+1)]
+    error = sum((simulation_output - interpolated_values)**2)  # Sum of squared errors
+    return error
+    # except:
+    #     return float('inf')
 # %%
 
 from scipy.optimize import minimize
+
+def print_guess(xk):
+    # Print the current parameters
+    print(f"Current Parameters: {xk}")
+
+    # Append the parameters to a text file
+    with open('parameters_log.txt', 'a') as file:
+        file.write(f"{xk}\n")
+
 
 def estimate_delays():
 
@@ -178,9 +187,6 @@ def estimate_ht():
     
     bounds = [ft_c_lims,tc_c_lims,mc_c_lims,ft_hx_lims,ht_hx_lims,ct_hx_lims,
               th_hxch_lims,ht_hxhw_lims,tw_hxhw_lims,ht_hxhwc_lims,tw_hxhwc_lims]
-
-    def print_guess(xk):
-        print(f"Current Parameters: {xk}")
 
     # Example usage in minimize
     result = minimize(
@@ -347,16 +353,16 @@ def estimate_feedback():
 def estimate_feedback_add_nodes():
     # set bounds
     a_f0 = a_f
-    a_f_bounds = (-20e-5, 20e-5)
+    a_f_bounds = (-20e-5, -0.5e-5)
 
     a_b0 = -a_b
     a_b_bounds = (-5e-5, 5e-5)
 
     a_c0 = a_c
-    a_c_bounds = (-20e-5, 20e-5)
+    a_c_bounds = (-20e-5, 0.0)
 
     ins0 = inserted 
-    ins_bounds = (1e-3, 20e-3)
+    ins_bounds = (0.5e-3, 20e-3)
 
     b0 = beta_t
     b_bounds = (1e-3,10e-3)
@@ -365,13 +371,19 @@ def estimate_feedback_add_nodes():
     bounds = [a_f_bounds,a_b_bounds,a_c_bounds,ins_bounds,b_bounds]
 
     # minimize
-    result = minimize(sumSq_add_nodes, initial_guess, bounds=bounds, method='Nelder-Mead')
+    result = minimize(sumSq_add_nodes, 
+                      initial_guess, 
+                      bounds=bounds, 
+                      method='Nelder-Mead',
+                      callback=print_guess)
 
     return result
+
+
 # %%
 result = estimate_feedback_add_nodes()
 
-# # %%
+# # # %%
 print(result.x)
 # # # Assuming 'result.x' contains the value you want to write to the file
 value_to_write = result.x
@@ -389,16 +401,18 @@ print(f"Value has been written to {file_path}")
 #from_file = [-1.99496857e-04, -4.99905872e-05,  1.74383022e-04,  6.82744637e-03, 3.52626522e-03] # no reinsertion
 #from_file = [-2.36341143e-05, -5.00000000e-05,  2.01131763e-05,  1.00000000e-03, 2.97544233e-03] # reinsertion, forgot rho function
 #from_file = [-4.12900591e-05,  4.33967181e-05,  1.85146114e-05,  1.76526592e-03, 2.22301472e-03]
-# from_file = [-2.75109719e-05,  1.35671394e-05,  1.92674101e-05,  1.01544816e-03, 3.38047855e-03] #NM
+#from_file = [-2.75109719e-05,  1.35671394e-05,  1.92674101e-05,  1.01544816e-03, 3.38047855e-03] #NM
 # from_file = [-2.00000000e-04, 4.99999886e-05, 1.47679144e-04, 7.31105685e-03, 1.00000000e-03]
-# a_f0 = a_f
-# a_b0 = a_b
-# a_c0 = a_c
-# ins0 = 0.0
-# b0 = beta_t
-# initial_guess = [a_f,a_b,a_c,0.0,beta_t]
+# # a_f0 = a_f
+# # a_b0 = a_b
+# # a_c0 = a_c
+# # ins0 = 0.0
+# # b0 = beta_t
+# # initial_guess = [a_f,a_b,a_c,0.0,beta_t]
 # res = relax_feedback_extra_nodes(from_file)
-# simulation_output = [s[8]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
+# simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
+# print(simulation_output-interpolated_values)
+
 # print(simulation_output[-1])
 # plt.plot(T_insert,simulation_output,label="JiTCDDE")
 # plt.plot(T_insert,interpolated_values,label="ORNL-1845")
