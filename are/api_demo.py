@@ -1,5 +1,5 @@
 from parameters import *
-from msrDynamics.objects import Node, System
+from msrDynamics.msrDynamics.objects import Node, System
 
 T_f_in =  Node(m = m_f_in,   # mass
                c = scp_f,    # specific heat capacity 

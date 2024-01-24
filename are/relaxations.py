@@ -8,7 +8,7 @@ from chspy import CubicHermiteSpline
 import os
 import sys
 sys.path.append(os.getcwd()+"/../../")
-from msrDynamics.objects import Node, System
+from msrDynamics.msrDynamics.objects import Node, System
 
 def relax_feedback_insertion_beta(params):
 

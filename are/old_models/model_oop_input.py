@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import sys
 sys.path.append(os.getcwd()+"/../../")
-from msrDynamics.objects import Node, System
+from msrDynamics.msrDynamics.objects import Node, System
 
 # %% [markdown]
 # Instantiate System Object & Nodes
