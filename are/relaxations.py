@@ -4,11 +4,7 @@ from jitcdde import t, jitcdde_input, input
 from heat_transfer import *
 from parameters import *
 from chspy import CubicHermiteSpline
-
-import os
-import sys
-sys.path.append(os.getcwd()+"/../../")
-from msrDynamics.msrDynamics.objects import Node, System
+from msrDynamics.objects import Node, System
 
 def relax_feedback_insertion_beta(params):
 
