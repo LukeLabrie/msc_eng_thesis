@@ -111,7 +111,8 @@ t_wd = t_ins + (60*4)
 pi = math.pi
 R = 8.314            # ideal gas constant
 m_H = 0.004          # molar mass of helium (kg/mol)
-P = 2.2              # steady-state power (MW) ORNL-1845 pg. 58
+#P = 2.2              # steady-state power (MW) ORNL-1845 pg. 58
+P = 7.0
 
 # density
 rho_inconel = 8.5*1000          # inconel density (kg/m^3)
@@ -162,7 +163,7 @@ k_2 = 1-k_1
 # thermal feedback (1/Kelvin, temperature provided in Kelvin) ORNL-1845 pg. 115
 a_f = (-9.8e-5)*9/5
 a_b = (1.1e-5)*9/5
-a_c = (-5.88e-5)*9/5
+a_c = (5.88e-5)*9/5
 
 # operating conditions taken from 25-hr Xenon run Exp. H-8
 # temperatures 
@@ -465,19 +466,3 @@ hxhwc_w_p4 = Point(16.67,21.5)
 hA_w_hxhwc_US = hA(W_hhwc_w_US,[hxhwc_w_p1,hxhwc_w_p2,hxhwc_w_p3,hxhwc_w_p4])
 hA_tw_hxhwc_US = 1/((1/hA_t_hxhwc_US)+(1/hA_w_hxhwc_US))
 hA_tw_hxhwc = hA_tw_hxhwc_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
