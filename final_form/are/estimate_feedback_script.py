@@ -24,8 +24,8 @@ adj = (df[0][0])*60-T_insert[0]
 df[0] = [(t*60)-adj for t in df[0]]
 
 # adjust to reported power
-# d = df[1][0]-P
-# df[1] = [p-d for p in df[1]]
+d = df[1][0]-P
+df[1] = [p-d for p in df[1]]
 
 # Set up interpolation
 # Assuming df[0] is time and df[1] is the data you want to interpolate
@@ -74,7 +74,7 @@ def sumSq_all(params):
 def sumSq_initial(params):
     try:
         # run
-        sol_jit = relax_fib_correct(params)
+        sol_jit = relax_fib_oop(params)
         
         # calculate error
         simulation_output = [s[6]*P for s in sol_jit][i_insert[0]:(i_insert[-1]+1)]
@@ -311,47 +311,47 @@ def estimate_all():
 def estimate_feedback():
     # set bounds
     a_f0 = a_f
-    a_f_bounds = (-20e-5, -1.0e-5)
+    a_f_bounds = (-20e-4, -1.0e-4)
 
     a_b0 = -a_b
     a_b_bounds = (-5e-5, 5e-5)
 
     a_c0 = -a_c
-    a_c_bounds = (0.5e-5, 20e-5)
+    a_c_bounds = (0.5e-4, 20e-4)
 
-    ins0 = inserted 
+    ins0 = 4e-3 
     ins_bounds = (1e-3, 20e-3)
 
     b0 = beta_t
     b_bounds = (0.5e-3,10e-3)
 
     initial_guess = [a_f0,a_b0,a_c0,ins0,b0]
+    # print(initial_guess)
     bounds = [a_f_bounds,a_b_bounds,a_c_bounds,ins_bounds,b_bounds]
 
     # minimize
     result = minimize(sumSq_initial, initial_guess, bounds=bounds,method='Nelder-Mead')
-
+    # result = 0
     return result
 
-# @profile
 def main():
     # # %%
-    # result = estimate_feedback()
+    result = estimate_feedback()
 
-    # # # %%
-    # print(result.x)
-    # # # # Assuming 'result.x' contains the value you want to write to the file
-    # value_to_write = result.x
+    # # %%
+    print(result.x)
+    # Assuming 'result.x' contains the value you want to write to the file
+    value_to_write = result.x
 
-    # # # # Specify the file path where you want to save the value
-    # file_path = "output_feedback_NM_corrected_oop.txt"
+    # Specify the file path where you want to save the value
+    file_path = "output_feedback_NM_corrected_oop.txt"
 
-    # # # # Open the file in write mode and write the value to it
-    # with open(file_path, "w") as file:
-    #     file.write(str(value_to_write))
+    # Open the file in write mode and write the value to it
+    with open(file_path, "w") as file:
+        file.write(str(value_to_write))
 
-    # # # # The value has been written to the file
-    # print(f"Value has been written to {file_path}")
+    # The value has been written to the file
+    print(f"Value has been written to {file_path}")
 
     #from_file = [-1.99496857e-04, -4.99905872e-05,  1.74383022e-04,  6.82744637e-03, 3.52626522e-03] # no reinsertion
     #from_file = [-2.36341143e-05, -5.00000000e-05,  2.01131763e-05,  1.00000000e-03, 2.97544233e-03] # reinsertion, forgot rho function
@@ -360,17 +360,17 @@ def main():
     # from_file = [-2.00000000e-04, 4.99999886e-05, 1.47679144e-04, 7.31105685e-03, 1.00000000e-03]
     # from_file = [-1.04393695e-04,  4.96066875e-05,  6.54751422e-05,  4.01316308e-03, 1.00000000e-03]
     # from_file = [-3.25674630e-05,  4.74282505e-05,  1.96386573e-05,  2.55065426e-03, -4.09869193e-04] # NM corrected power
-    a_f0 = a_f
-    a_b0 = a_b
-    a_c0 = a_c
-    ins0 = inserted
-    b0 = beta_t
-    initial_guess = [a_f,a_b,a_c,ins0,beta_t]
-    for _ in range(50):
-        res = relax_fib_oop(initial_guess)
+    # from_file = [-1.00741582e-04,  4.11146925e-05,  9.70143387e-05,  8.11758590e-03, 5.43815400e-04] # oop
+    # a_f0 = a_f
+    # a_b0 = a_b
+    # a_c0 = a_c
+    # ins0 = 4e-3
+    # b0 = beta_t
+    # initial_guess = [a_f,a_b,a_c,ins0,beta_t]
+    # res = relax_fib_oop(from_file)
     # simulation_output = [s[6]*P for s in res][i_insert[0]:(i_insert[-1]+1)]
-    # print(simulation_output[-1])
-    print(res[-1][6])
+    # # print(simulation_output[-1])
+    # print(res[-1][6])
     # plt.plot(T_insert,simulation_output,label="JiTCDDE")
     # plt.plot(T_insert,interpolated_values,label="ORNL-1845")
     # plt.xlabel(r"$t$ (s)")

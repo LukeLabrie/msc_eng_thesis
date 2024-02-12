@@ -102,7 +102,6 @@ tf = 1000.00
 T = np.arange(t0,tf,0.01)
 
 # reactivity insertion
-# inserted = 4e-3
 inserted = 0.0
 insert_duration = 0.4/0.011 # ORNL-1845
 t_ins = 300.00
@@ -112,7 +111,7 @@ t_wd = t_ins + (60*4)
 pi = math.pi
 R = 8.314            # ideal gas constant
 m_H = 0.004          # molar mass of helium (kg/mol)
-P = 2.12             # experiment H-8/H-12, one dollar reactivity insertion, 25hr Xenon run, ORNL-1845 p. 186
+P = 4.12             # experiment H-8/H-12, one dollar reactivity insertion, 25hr Xenon run, ORNL-1845 p. 186
 
 # density
 rho_inconel = 8.5*1000          # inconel density (kg/m^3)
@@ -177,7 +176,7 @@ T0_c_m = F_to_K(1300)           # beryllium initial temp
 
 # flow rates 
 F_c_f = 46/15850       # core fuel flow rate (gal/min)->(m^3/s) ORNL-1845 pg. 120
-F_c_c = 150/15850      # core coolant flow rate (gal/min)->(m^3/s) ORNL-1845 pg. 120
+F_c_c = 150/15850      # core coolant flow rate (gal/min)->(m^3/s) ORNL-1845 pg. 121
 
 # dimensions
 V_fuel = 52071.248849/1e6                                # CAD model (cm^3)->(m^3)
@@ -266,6 +265,7 @@ mcp_f_c = scp_f*m_f_c
 mcp_c_c = scp_c*m_c_c 
 mcp_m_c = scp_m*m_m_c
 
+# correction 
 # hA_ft_c = (1/0.503)*(9/5)*(1.05504)*(1e-3)
 # hA_tc_c = hA_ft_c
 
@@ -274,8 +274,8 @@ mcp_m_c = scp_m*m_m_c
 ###############################################################################
 
 # initial temperatures
-T0_hfh_f1 = F_to_K(1522)   # fuel-helium hx fuel inlet temp (K) ORNL-1845 pg. 121
-T0_hfh_f2 = F_to_K(1209)   # fuel-helium hx fuel oulet temp (K) ORNL-1845 pg. 121
+T0_hfh_f1 = F_to_K(1450)   # fuel-helium hx fuel inlet temp (K) ORNL-1845 pg. 121
+T0_hfh_f2 = F_to_K(1150)   # fuel-helium hx fuel oulet temp (K) ORNL-1845 pg. 121
 T0_hfh_h1 = F_to_K(180)    # fuel-helium hx helium inlet temp (K) ORNL-1845 pg. 121
 T0_hfh_h2 = F_to_K(620)    # fuel-helium hx helium outlet temp (K) ORNL-1845 pg. 121
 T0_hfh_t1 = ((T0_hfh_f1+T0_hfh_h1)/2) # initial tube temp
@@ -302,7 +302,7 @@ m_t_hxfh = V_t_hx*rho_inconel
 hA_f_hx_US = 5.724   # BTU/(sec*degF) ORNL-1535 p.47
 hA_t_hx_US = 1/0.137 # BTU/(sec*degF) ORNL-1535 p.47
 hA_ft_hx_US = 1/((1/hA_f_hx_US)+(1/hA_t_hx_US))
-hA_ft_hx = hA_ft_hx_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> (MW/C)
+hA_ft_hx = hA_ft_hx_US*(9/5)*(1.05504)*(1e-3) 
 
 # mass flow rate of helium
 W_h_fh = F_hfh_h1*(0.1362) # (kg/s) = volumetric flow rate * denisty of helium at 180F, 2.2 H20, 7300 cfm ORNL-1845 p.122
@@ -375,8 +375,8 @@ hA_tw_hxhw = hA_tw_hxhw_US*(9/5)*(1.05504)*(1e-3)     # BTU/(sec*degF) -> MW/C
 ###############################################################################
 
 # initial temperatures
-T0_hch_c1 = F_to_K(1335)  # coolant-helium hx coolant inlet temp (K) ORNL-1845 pg. 121 
-T0_hch_c2 = F_to_K(1226)  # coolant-helium hx coolant outlet temp (K) ORNL-1845 pg. 121 
+T0_hch_c1 = F_to_K(1235)  # coolant-helium hx coolant inlet temp (K) ORNL-1845 pg. 121 
+T0_hch_c2 = F_to_K(1105)  # coolant-helium hx coolant outlet temp (K) ORNL-1845 pg. 121 
 
 T0_hch_h1 = F_to_K(170)  # coolant-helium hx helium inlet temp (K) ORNL-1845 pg. 122 
 T0_hch_h2 = F_to_K(1020)  # coolant-helium hx helium outlet temp (K) ORNL-1845 pg. 122 
@@ -428,8 +428,8 @@ hA_th_hxch = hA_th_hxch_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
 T0_hhwc_h1 = F_to_K(1020)    # helium-water hx (coolant loop) helium inlet temp (K) ORNL-1845 pg. 122
 T0_hhwc_h2 = F_to_K(170)    # helium-water hx (coolant loop) helium outlet temp (K) ORNL-1845 pg. 122
 
-T0_hhwc_w1 = F_to_K(70)    # helium-water hx (coolant loop) water inlet temp (K) ORNL-1845 pg. 121 
-T0_hhwc_w2 = F_to_K(100)   # helium-water hx (coolant loop) water water outlet temp (K) ORNL-1845 pg. 121
+T0_hhwc_w1 = F_to_K(61)    # helium-water hx (coolant loop) water inlet temp (K) ORNL-1845 pg. 121 
+T0_hhwc_w2 = F_to_K(114)   # helium-water hx (coolant loop) water water outlet temp (K) ORNL-1845 pg. 121
 
 T0_hhwc_t1 = ((T0_hhwc_h1+T0_hhwc_w1)/2)
 
@@ -473,3 +473,35 @@ hA_w_hxhwc_US = hA(W_hhwc_w_US,[hxhwc_w_p1,hxhwc_w_p2,hxhwc_w_p3,hxhwc_w_p4])
 hA_tw_hxhwc_US = 1/((1/hA_t_hxhwc_US)+(1/hA_w_hxhwc_US))
 hA_tw_hxhwc = hA_tw_hxhwc_US*(9/5)*(1.05504)*(1e-3) # BTU/(sec*degF) -> MW/C
 
+# power fraction as calculated from steady state
+hx_hwf1 = 0.4054600395507873
+hx_hwf2 = 0.40545967824513574
+hx_hwc1 = 0.09454014110203846
+hx_hwc2 = 0.09454014110203846
+
+# overall coefficients for heat exchangers
+dT_lm_f = ((F_to_K(1450)-F_to_K(620))-(F_to_K(1150)-F_to_K(180)))/math.log((F_to_K(1450)-F_to_K(620))/(F_to_K(1150)-F_to_K(180)))
+h_overall_f = P*(hx_hwf1)/dT_lm_f
+hA_ft_hx = h_overall_f
+hA_ht_hx = h_overall_f
+
+dT_lm_c = ((F_to_K(1235)-F_to_K(1020))-(F_to_K(1105)-F_to_K(170)))/math.log((F_to_K(1235)-F_to_K(1020))/(F_to_K(1105)-F_to_K(170)))
+h_overall_c = P*(hx_hwc1)/dT_lm_c
+hA_ct_hx = h_overall_c
+hA_th_hxch = h_overall_c
+
+dT_lm_hf = ((F_to_K(620)-F_to_K(135))-(F_to_K(180)-F_to_K(70)))/math.log((F_to_K(620)-F_to_K(135))/(F_to_K(180)-F_to_K(70)))
+h_overall_hf = P*(hx_hwf1)/dT_lm_hf
+hA_ht_hxhw = h_overall_hf
+hA_tw_hxhw = h_overall_hf
+
+dT_lm_hc = ((F_to_K(1020)-F_to_K(100))-(F_to_K(170)-F_to_K(70)))/math.log((F_to_K(1020)-F_to_K(100))/(F_to_K(170)-F_to_K(70)))
+h_overall_hc = P*(hx_hwc1)/dT_lm_hc
+hA_ht_hxhwc = h_overall_hc
+hA_tw_hxhwc = h_overall_hc
+
+# overall coefficient for core 
+dT_lm_cf = ((F_to_K(1450)-F_to_K(620))-(F_to_K(1150)-F_to_K(180)))/math.log((F_to_K(1450)-F_to_K(620))/(F_to_K(1150)-F_to_K(180)))
+h_overall_f = P*(hx_hwf1)/dT_lm_f
+hA_ft_hx = h_overall_f
+hA_ht_hx = h_overall_f

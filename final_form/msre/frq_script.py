@@ -9,18 +9,13 @@ import sympy as sp
 from concurrent.futures import ProcessPoolExecutor
 from scipy.signal import find_peaks
 
-# unpack ORNL data
-# df_magnitude = pd.read_csv(f"./data/ORNL_msre_{int(P)}MW_U233_magnitude.csv",names=['f','mag'])
-# df_phase = pd.read_csv(f"./data/ORNL_msre_{int(P)}MW_U233_phase.csv",names=['f','phase'])
-
-# get freqency range
-# f_start = min([df_magnitude['f'].iloc[0], df_phase['f'].iloc[0]])
-# f_end = max([df_magnitude['f'].iloc[-1], df_phase['f'].iloc[-1]])
-# f_range = np.arange(f_start,f_end,(f_end-f_start)/100)
 f_range = np.logspace(-2, 1, num=100)
-
-
+tau_l = 2 * tau_l
+tau_c = 2*tau_c
+tau_c_hx = 2 * tau_c_hx
+tau_hx_c = 2 * tau_hx_c
 def process_frequency(f):
+
     MSRE = System()
 
     # radiator
@@ -52,7 +47,7 @@ def process_frequency(f):
     # add reactivity input
     r = 1e-5
     def rho_insert(t):
-                return r*sp.sin(f*t)
+        return r*sp.sin(f*t)
 
     rho_ext = MSRE.add_input(rho_insert, T)
 
@@ -61,7 +56,7 @@ def process_frequency(f):
     T_cf2 = Node(m = mn_f, scp = scp_f, W = W_f, y0 = T0_f2)
 
     MSRE.add_nodes([T_out_rc,T_out_air,T_hf1,T_hf2,T_hf3,T_hf4,T_ht1,T_ht2,T_hc1,
-            T_hc2,T_hc3,T_hc4,n,C1,C2,C3,C4,C5,C6,T_cg,T_cf1,T_cf2,rho])
+                T_hc2,T_hc3,T_hc4,n,C1,C2,C3,C4,C5,C6,T_cg,T_cf1,T_cf2,rho])
 
     # dynamics 
 
@@ -128,30 +123,35 @@ def process_frequency(f):
     MSRE.solve(T)
 
     i_out = [i for i in range(len(T)) if T[i] >= 500]
-    n_out = np.array(n.y_out[i_out[0]:i_out[-1]+1])
+    n0 = n.y_out[i_out[0]-25]
+    n_out = np.array(n.y_out)[i_out]
 
-    # Assuming n_out is your steady-state output array and T is your time array
-
-    # Calculate Output Amplitude
+    # calculate output amplitude
     peaks, _ = find_peaks(n_out)
     troughs, _ = find_peaks(-n_out)
     amplitude = (np.mean(n_out[peaks]) - np.mean(n_out[troughs]))/2
 
-    # Calculate Gain
-    input_amplitude = 1e-5  # as per your input function
-    gain = amplitude / input_amplitude
+    # calculate Gain
+    input_amplitude = 1e-5  
+    gain = amplitude / (input_amplitude*n0)
 
-    # Calculate Phase Shift
-    # Assuming you have a corresponding time array for your output
+    # calculate Phase Shift
     peak_times = T[i_out][peaks]
     input_period = 2 * np.pi / f
+    input_signal = [i[0] for i in MSRE.input.get_state(T)]
+    input_peaks, _ = find_peaks(input_signal)
+    time_differences = [abs(T[input_peaks[i]] - peak_times[0]) for i in range(len(input_peaks))]
+    closest_peak_index = np.argmin(time_differences)
+    closest_peak_time = T[input_peaks[closest_peak_index]]
+    
+    # calculate Phase Shift
+    phase_shift = 360*(closest_peak_time-peak_times[0])/input_period
 
-    T_fit = 2 * np.pi / f
-    t_peak = 500+(T_fit / 4)
-
-    # Calculate Phase Shift
-    phase_shift = ((peak_times[0] - t_peak) % input_period) / input_period * 360
-
+    if (phase_shift>180):
+        phase_shift = -360+phase_shift
+    elif (phase_shift<-180):
+        phase_shift = 360-phase_shift
+           
     return f, gain, phase_shift
 
 with ProcessPoolExecutor() as executor:
@@ -161,7 +161,7 @@ with ProcessPoolExecutor() as executor:
 results_df = pd.DataFrame(results, columns=['Frequency', 'Gain', 'Phase Shift'])
 
 # Write to CSV file
-csv_filename = "frequency_response_results.csv"
+csv_filename = f"frequency_response_results_{P}_MW_double_tau.csv"
 results_df.to_csv(csv_filename, index=False)
 
 print(f"Results written to {csv_filename}")

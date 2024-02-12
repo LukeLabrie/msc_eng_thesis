@@ -1,21 +1,25 @@
 import numpy as np
 
+
+
 # domain
 t0 = 0.0
 tf = 1000.00
 T = np.arange(t0,tf,0.01)
 
 # REACTIVITY INSERTION
-inserted = 1.39e-4 # 1MW
-# inserted = 1.96e-4 # 5MW
+# inserted = 1.39e-4 # 1MW
+inserted = 1.96e-4 # 5MW
 # inserted = 2.48e-4 # 8MW
 
 # NEUTRONICS DATA
 tau_l = 16.73
 tau_c = 8.46
-# P = 1  
+# P = 0.1
+# P = 1.0  
 # P = 5
-P = 8    
+# P = 8    
+P = 8
 n_frac0 = 1  # initial fractional neutron density n/n0
 Lam = 4.0E-04
 lam = np.array([1.260E-02, 3.370E-02, 1.390E-01, 3.250E-01, 1.130E+00, 2.500E+00])
@@ -144,8 +148,8 @@ mcp_rsn = mn_rs * scp_rs
 hA_rsn = h_roverall * A_rad / nn_rs
 
 # Pure time delays between components
-tau_hx_c = 8.67
-tau_c_hx = 3.77
+tau_hx_c = 8.67+2.145 
+tau_c_hx = 3.77+2.145
 tau_hx_r = 4.71
 tau_r_hx = 8.24
 
