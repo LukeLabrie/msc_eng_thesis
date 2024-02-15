@@ -102,7 +102,6 @@ tf = 1000.00
 T = np.arange(t0,tf,0.01)
 
 # reactivity insertion
-inserted = 0.0
 insert_duration = 0.4/0.011 # ORNL-1845
 t_ins = 300.00
 t_wd = t_ins + (60*4)
@@ -111,7 +110,7 @@ t_wd = t_ins + (60*4)
 pi = math.pi
 R = 8.314            # ideal gas constant
 m_H = 0.004          # molar mass of helium (kg/mol)
-P = 4.12             # experiment H-8/H-12, one dollar reactivity insertion, 25hr Xenon run, ORNL-1845 p. 186
+P = 2.12             # H-12, 25hr Xenon run, ORNL-1845 p. 186
 
 # density
 rho_inconel = 8.5*1000          # inconel density (kg/m^3)
@@ -127,14 +126,15 @@ scp_h = 1.248*4.1869e-3 # specigic heat capacity of helium (BTU/lb*defF) -> (MJ/
 scp_m = 0.48*4.1869e-3  # specific heat capcity of moderator (BTU/lb*defF) -> (MJ/kg-C) ORNL-1845 p.113
 
 # delays
-tau_hx_c_f = 20. # fuel-helium hx to core delay (unknown)
-tau_hx_c_c = 20. # coolant-helium hx to core delay (unknown)
-tau_c_hx_f = 20. # core->hx delay (unknown)
+tau_l = 47.0  # ORNL-1845 p. 93
+tau_c = 8.3  # ORNL-1845 p.120
+tau_hx_c_f = tau_l/2 # fuel-helium hx to core delay 
+tau_hx_c_c = tau_l/2 # coolant-helium hx to core delay (unknown, assumed same as fuel) 
+tau_c_hx_f = tau_l/2 # core->hx delay 
+
 tau_h = 0.5      # helium loop delay (unknown)
 
 # NEUTRONICS DATA, borrowed from MSRE model
-tau_l = 40.0  # ORNL-TM-0728 %16.44; % (s)
-tau_c = 8.3  # ORNL-1845 p.120
 #tau_l = 5.00  # ORNL-TM-0728 %16.44; % (s)
 #tau_c = 8.3  # ORNL-1845 p.120
 n_frac0 = 1.0  # initial fractional neutron density n/n0 (n/cm^3/s)
@@ -145,6 +145,12 @@ lam = np.array([1.240E-02, 3.05E-02, 1.11E-01, 3.01E-01, 1.140E+00, 3.014E+00])
 beta = (np.array([0.000223, 0.001457, 0.001307, 0.002628, 0.000766, 0.00023]))  # U235
 # beta = np.array([0.00023, 0.00079, 0.00067, 0.00073, 0.00013, 0.00009])  # U233
 beta_t = np.sum(beta)  # total delayed neutron fraction MSRE
+
+# # ARE
+beta_fracs = beta/beta_t
+beta_t = 0.0047 # ORNL-1845 pg. 150
+beta = np.array([beta_fracs[i]*beta_t for i in range(len(beta))])
+
 rho_0 = beta_t-sum(np.divide(beta,1+np.divide(1-np.exp(-lam*tau_l),lam*tau_c))) # reactivity change in going from stationary to circulating fuel
 C0 = beta / Lam * (1.0 / (lam - (np.exp(-lam * tau_l) - 1.0) / tau_c))
 
@@ -274,8 +280,8 @@ mcp_m_c = scp_m*m_m_c
 ###############################################################################
 
 # initial temperatures
-T0_hfh_f1 = F_to_K(1450)   # fuel-helium hx fuel inlet temp (K) ORNL-1845 pg. 121
-T0_hfh_f2 = F_to_K(1150)   # fuel-helium hx fuel oulet temp (K) ORNL-1845 pg. 121
+T0_hfh_f1 = F_to_K(1522)   # fuel-helium hx fuel inlet temp (K) ORNL-1845 pg. 121
+T0_hfh_f2 = F_to_K(1209)   # fuel-helium hx fuel oulet temp (K) ORNL-1845 pg. 121
 T0_hfh_h1 = F_to_K(180)    # fuel-helium hx helium inlet temp (K) ORNL-1845 pg. 121
 T0_hfh_h2 = F_to_K(620)    # fuel-helium hx helium outlet temp (K) ORNL-1845 pg. 121
 T0_hfh_t1 = ((T0_hfh_f1+T0_hfh_h1)/2) # initial tube temp
@@ -375,8 +381,8 @@ hA_tw_hxhw = hA_tw_hxhw_US*(9/5)*(1.05504)*(1e-3)     # BTU/(sec*degF) -> MW/C
 ###############################################################################
 
 # initial temperatures
-T0_hch_c1 = F_to_K(1235)  # coolant-helium hx coolant inlet temp (K) ORNL-1845 pg. 121 
-T0_hch_c2 = F_to_K(1105)  # coolant-helium hx coolant outlet temp (K) ORNL-1845 pg. 121 
+T0_hch_c1 = F_to_K(1335)  # coolant-helium hx coolant inlet temp (K) ORNL-1845 pg. 121 
+T0_hch_c2 = F_to_K(1226)  # coolant-helium hx coolant outlet temp (K) ORNL-1845 pg. 121 
 
 T0_hch_h1 = F_to_K(170)  # coolant-helium hx helium inlet temp (K) ORNL-1845 pg. 122 
 T0_hch_h2 = F_to_K(1020)  # coolant-helium hx helium outlet temp (K) ORNL-1845 pg. 122 
@@ -494,21 +500,21 @@ hx_hwc2 = 0.09454014110203846
 # hA_ht_hx = h_overall_f
 
 dT_lm_f = ((F_to_K(1450)-F_to_K(620))-(F_to_K(1150)-F_to_K(180)))/math.log((F_to_K(1450)-F_to_K(620))/(F_to_K(1150)-F_to_K(180)))
-h_overall_f = P*(hx_hwf1)/dT_lm_f
+h_overall_f = P*(hx_hwf1+hx_hwf2)/dT_lm_f
 hA_ft_hx = h_overall_f
 hA_ht_hx = h_overall_f
 
 dT_lm_c = ((F_to_K(1235)-F_to_K(1020))-(F_to_K(1105)-F_to_K(170)))/math.log((F_to_K(1235)-F_to_K(1020))/(F_to_K(1105)-F_to_K(170)))
-h_overall_c = P*(hx_hwc1)/dT_lm_c
+h_overall_c = P*(hx_hwc1+hx_hwc2)/dT_lm_c
 hA_ct_hx = h_overall_c
 hA_th_hxch = h_overall_c
 
 dT_lm_hf = ((F_to_K(620)-F_to_K(135))-(F_to_K(180)-F_to_K(70)))/math.log((F_to_K(620)-F_to_K(135))/(F_to_K(180)-F_to_K(70)))
-h_overall_hf = P*(hx_hwf1)/dT_lm_hf
+h_overall_hf = P*(hx_hwf1+hx_hwf2)/dT_lm_hf
 hA_ht_hxhw = h_overall_hf
 hA_tw_hxhw = h_overall_hf
 
 dT_lm_hc = ((F_to_K(1020)-F_to_K(100))-(F_to_K(170)-F_to_K(70)))/math.log((F_to_K(1020)-F_to_K(100))/(F_to_K(170)-F_to_K(70)))
-h_overall_hc = P*(hx_hwc1)/dT_lm_hc
+h_overall_hc = P*(hx_hwc1+hx_hwc2)/dT_lm_hc
 hA_ht_hxhwc = h_overall_hc
 hA_tw_hxhwc = h_overall_hc
